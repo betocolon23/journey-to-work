@@ -1,14 +1,16 @@
 import React from 'react';
 import { Map, TileLayer, Marker, Popup, LeafletMap, FeatureGroup, GeoJSON, Overlay, LayersControl, BaseLayer } from 'react-leaflet';
+import { L } from 'leaflet';
 import Municipios from './municipio-data';
 import Feature from './county-data';
+
 
 
 export default class MapComponent extends React.Component {
     constructor(props) {
         super(props);
+        
         this.style = this.style.bind(this);
-        this.getGeoJson = this.getGeoJson.bind(this);
     }
 
     style(feature) {
@@ -22,15 +24,11 @@ export default class MapComponent extends React.Component {
         };
     }
 
-    getGeoJson() {
-        console.log(Municipios);
-        return Municipios
-    }
 
     render() {
         return (
-            <div id="map" style={{ height: '600px' }}>
-                <Map
+            <div id="map" >
+                {/* <Map
                     center={[18.2208, -66.5901]}
                     zoom={9}
                     url={'https://api.tiles.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w'}
@@ -42,14 +40,14 @@ export default class MapComponent extends React.Component {
                             />
                         </LayersControl.BaseLayer>
                         <LayersControl.Overlay name="municipio" checked>
-                            <GeoJSON 
-                                data={this.getGeoJson()} 
+                            <GeoJSON
+                                data={data}
                                 style={this.style}
                                 key={Municipios}
                             />
                         </LayersControl.Overlay>
                     </LayersControl>
-                </Map>
+                </Map> */}
             </div>
         )
     }

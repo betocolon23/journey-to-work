@@ -2,12 +2,13 @@ import React from 'react';
 import SelectField from 'material-ui/SelectField';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
+import Feature from './county-data';
 
 export default class DropDown extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: 1,
+      value: 1
     };
     this.menuItems = this.menuItems.bind(this);
   }
@@ -19,6 +20,7 @@ export default class DropDown extends React.Component {
   }
 
   render() {
+    // console.log(Feature);
     return (
       <div>
         <DropDownMenu 
