@@ -11,7 +11,7 @@ html {
 
 .top-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     padding: 10px;
 }
 

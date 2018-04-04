@@ -9,23 +9,21 @@ import RadioComponent from './RadioComponent';
 import css from '../styles.css';
 
 //data
-// import Feature from './county-data';
-const data = require('./municipioData.json')
+const municipios = require('./municipioData.json')
 const county_data = require('./county-data')
 
 export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            "selected": "County Name"
+            "selected": []
         }
-        console.log();
+        // console.log(county_data.features[0].properties['County Name']);
+        // console.log(municipios.features[0].properties['geo_id'])
         this.handleChangeMunicipio.bind(this);
     }
 
-    componentDidMount() {
-        // console.log(data);        
-
+    componentDidMount() {        
         var map = L.map('map').setView([18.2208, -66.3500], 9);
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -44,7 +42,7 @@ export default class App extends React.Component {
 
         function style(feature) {
             return {
-                fillColor: this.getColor(feature.properties.area),
+                fillColor: this.getColor(),
                 weight: 2,
                 opacity: 1,
                 color: 'white',
@@ -53,7 +51,11 @@ export default class App extends React.Component {
             };
         }
 
-        L.geoJson(data).addTo(map);
+        L.geoJson(municipios).addTo(map);
+
+        // this.setState({
+        //     selected: county_data.features.properties['County Name'],
+        // });
     }
 
     //Para el dropdown list de municipios - Sacarlos del GEOJSON
@@ -70,7 +72,8 @@ export default class App extends React.Component {
                             className={"drop-down"}
                             onChange={this.handleChangeMunicipio}
                             selected={this.state.selected}
-                            data={data}
+                            municipios={municipios}
+                            county={county_data}
                         />
                         <RadioComponent
                             className={"radio-component"}

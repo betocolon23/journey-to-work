@@ -2,7 +2,7 @@ import React from 'react';
 import SelectField from 'material-ui/SelectField';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
-import Feature from './county-data';
+
 
 export default class DropDown extends React.Component {
   constructor(props) {
@@ -11,17 +11,20 @@ export default class DropDown extends React.Component {
       value: 1
     };
     this.menuItems = this.menuItems.bind(this);
-    console.log(this.props.data);
+    console.log(this.props.county);
+    console.log(this.props.municipios)
   }
 
-  menuItems(municipios) {
-    return municipios.map((municipio, index) => (
-      <MenuItem key={index} value={municipio.id} primaryText={municipio.id} />
+  menuItems(county) {
+    return county.map((municipio, index) => (
+      <MenuItem 
+        key={index} 
+        value={municipio.features.properties} 
+        primaryText={county.features[0].properties} />
     ));
   }
 
   render() {
-    // console.log(Feature);
     return (
       <div>
         <DropDownMenu 
@@ -31,7 +34,6 @@ export default class DropDown extends React.Component {
           value={this.props.selected}
           onChange={this.props.onChange}
         >
-        
         </DropDownMenu>
       </div>
     );
