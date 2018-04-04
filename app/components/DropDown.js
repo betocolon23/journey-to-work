@@ -11,6 +11,7 @@ export default class DropDown extends React.Component {
       value: 1
     };
     this.menuItems = this.menuItems.bind(this);
+    console.log(this.props.data);
   }
 
   menuItems(municipios) {
