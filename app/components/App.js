@@ -9,7 +9,7 @@ import RadioComponent from './RadioComponent';
 import css from '../styles.css';
 
 //data
-const municipios = require('./municipioData.json')
+const geoJsonFeature = require('./geoJsonData.json')
 const county_data = require('./county-data')
 
 export default class App extends React.Component {
@@ -18,17 +18,51 @@ export default class App extends React.Component {
         this.state = {
             "selected": []
         }
-        // console.log(county_data.features[0].properties['County Name']);
-        // console.log(municipios.features[0].properties['geo_id'])
+        
+        console.log(county_data.features[0].properties['County Name']);
+        console.log(geoJsonFeature.features[0].properties['geo_id'])
         this.handleChangeMunicipio.bind(this);
     }
 
-    componentDidMount() {        
+    componentDidMount() {
         var map = L.map('map').setView([18.2208, -66.3500], 9);
+
+
+
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
         }).addTo(map);
 
+        //control that show state info on hover
+        var info = L.control();
+
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        }
+
+        info.update = function (props) {
+            console.log(props);
+            
+            if (props) {
+                var municipality_county_data = county_data.features.filter(function(data) {
+                    return data.properties['County Code Residence'] === props.geo_id;
+                })
+
+                console.log(municipality_county_data);
+
+                this._div.innerHTML = '<h4>Puerto Rico Journey to Work Map</h4>' + (props ?
+                    '<b>' + props.Municipio + '</b><br />' + ' inbound / outbout '
+                    : 'Hover over a county');
+                
+            }
+
+        };
+
+        info.addTo(map);
+
+        // get color depending on population density value
         function getColor(d) {
             return d > 1000 ? '#800026' :
                 d > 500 ? '#BD0026' :
@@ -42,23 +76,89 @@ export default class App extends React.Component {
 
         function style(feature) {
             return {
-                fillColor: this.getColor(),
                 weight: 2,
                 opacity: 1,
                 color: 'white',
                 dashArray: '3',
-                fillOpacity: 0.7
+                fillOpacity: 0.7,
+                fillColor: getColor(feature.properties.density)
             };
         }
 
-        L.geoJson(municipios).addTo(map);
+        function highlightFeature(e) {
+            var layer = e.target;
+
+            layer.setStyle({
+                weight: 5,
+                color: '#666',
+                dashArray: '',
+                fillOpacity: 0.7
+            });
+
+            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                layer.bringToFront();
+            }
+
+            info.update(layer.feature.properties);
+        }
+
+        var geojson;
+
+        function resetHighlight(e) {
+            geojson.resetStyle(e.target);
+            info.update();
+        }
+
+        function zoomToFeature(e) {
+            map.fitBounds(e.target.getBounds());
+        }
+
+        function onEachFeature(feature, layer) {
+            layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+                click: zoomToFeature
+            });
+        }
+
+        geojson = L.geoJson(geoJsonFeature, {
+            style: style,
+            onEachFeature: onEachFeature
+        }).addTo(map);
+
+        map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+
+
+        // var legend = L.control({ position: 'bottomright' });
+
+        // legend.onAdd = function (map) {
+
+        //     var div = L.DomUtil.create('div', 'info legend'),
+        //         grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+        //         labels = [],
+        //         from, to;
+
+        //     for (var i = 0; i < grades.length; i++) {
+        //         from = grades[i];
+        //         to = grades[i + 1];
+
+        //         labels.push(
+        //             '<i style="background:' + getColor(from + 1) + '"></i> ' +
+        //             from + (to ? '&ndash;' + to : '+'));
+        //     }
+
+        //     div.innerHTML = labels.join('<br>');
+        //     return div;
+        // };
+
+        // legend.addTo(map);
 
         // this.setState({
         //     selected: county_data.features.properties['County Name'],
         // });
     }
 
-    //Para el dropdown list de municipios - Sacarlos del GEOJSON
+    //Para el dropdown list de geoJsonFeature - Sacarlos del GEOJSON
     handleChangeMunicipio(event, index, value) {
         this.setState({ selected: value });
     }
@@ -72,7 +172,7 @@ export default class App extends React.Component {
                             className={"drop-down"}
                             onChange={this.handleChangeMunicipio}
                             selected={this.state.selected}
-                            municipios={municipios}
+                            geoJsonFeature={geoJsonFeature}
                             county={county_data}
                         />
                         <RadioComponent

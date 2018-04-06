@@ -12,11 +12,11 @@ export default class DropDown extends React.Component {
     };
     this.menuItems = this.menuItems.bind(this);
     console.log(this.props.county);
-    console.log(this.props.municipios)
+    console.log(this.props.geoJsonFeature)
   }
 
   menuItems(county) {
-    return county.map((municipio, index) => (
+    return this.props.county.map((municipio, index) => (
       <MenuItem 
         key={index} 
         value={municipio.features.properties} 
@@ -27,14 +27,16 @@ export default class DropDown extends React.Component {
   render() {
     return (
       <div>
-        <DropDownMenu 
+        <SelectField
+          floatingLabelText="Select County" 
           style={{ width: '300px' }}
           autoWidth={false}
           multiple={true}
           value={this.props.selected}
           onChange={this.props.onChange}
         >
-        </DropDownMenu>
+        {/* {this.menuItems(this.props.county)} */}
+        </SelectField>
       </div>
     );
   }
