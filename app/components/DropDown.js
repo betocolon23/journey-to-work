@@ -11,8 +11,8 @@ export default class DropDown extends React.Component {
       value: 1
     };
     this.menuItems = this.menuItems.bind(this);
-    console.log(this.props.county);
-    console.log(this.props.geoJsonFeature)
+    // console.log(this.props.county);
+    // console.log(this.props.geoJsonFeature)
   }
 
   menuItems(county) {
