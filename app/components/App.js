@@ -18,9 +18,6 @@ export default class App extends React.Component {
         this.state = {
             "selected": []
         }
-
-        // console.log(county_data.features[0].properties['County Name']);
-        // console.log(geoJsonFeature.features[0].properties['geo_id'])
         this.handleChangeMunicipio.bind(this);
     }
 
@@ -43,21 +40,17 @@ export default class App extends React.Component {
         info.update = function (props) {
             console.log(props);
             if (props) {
-                // var municipality_county_data = county_data.features.filter(function (data) {
-                //     return data.properties['County Code Residence'] === props.geo_id;
-                // })
                 var county_names = county_data.features.map(function (data) {
                     if (data.properties['County Code Residence'] === props.geo_id) {
-                        return data.properties['County Name_1'].trim();
+                        return data.properties['County Name_1'].trim(); 
+                        //Add Workers Commuting Flow
                     }
-                })
-
-                // console.log(municipality_county_data);
+                }); 
                 console.log('county names: ', county_names.filter(Boolean));
-                this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
-                    '<h4>' + props.Municipio + '</h4>' + '</h4>' + 'inbound / outbound' + '</h4>'
-                    : 'Hover over a county');
             }
+            this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
+                '<h4>' + props.Municipio + '</h4>' + '</h4>' + 'inbound / outbound' + '</h4>'
+                : 'Hover over a county');
         };
 
         info.addTo(map);
@@ -88,7 +81,6 @@ export default class App extends React.Component {
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
             }
-
             info.update(layer.feature.properties);
         }
 
@@ -100,19 +92,9 @@ export default class App extends React.Component {
             info.update();
         }
 
-        // var county_name = county_data.features.filter(function (data) {
 
-        //     // trim() elimina el/los ultimos espacios en un string
-        //     return data.properties['County Name'].trim() === 'Culebra';
-        // });
+        //Funcion para cambiar de color cada layer de acuerdo al municipio seleccionado: 
 
-        // var county_names = county_data.features.map(function (data) {
-        //     if (data.properties['County Code Residence'] === props.geo_id) {
-        //         return data.properties['County Name'].trim();
-        //     }
-        // });
-        
-        // console.log('COUNTY NAMES: ', county_names);
 
         //Color Clicked Municipio
         function clickedFeature(e) {
@@ -133,21 +115,16 @@ export default class App extends React.Component {
             info.update(layer.feature.properties)
         }
 
-        //Reset Clicked County to original color
-        function resetClicked(e) {
-            geojson.resetStyle(e.target);
-            info.update();
-        }
-
         //On Each Feature apply following function: 
         function onEachFeature(feature, layer) {
             var selected;
             layer.on({
-                // click: clickedFeature,
-                // click: resetClicked,
-                mouseover: highlightFeature, 
-                mouseout: resetHighlight 
+                click: clickedFeature,
+                // mouseover: highlightFeature, 
+                // mouseout: resetHighlight 
             });
+
+            //Añadir County Data --- Coummuting Work === geo_id
             if (feature.properties) {
                 layer.bindPopup("Workers in Commuting Flow:" + " " + "<div>Inbound to County</div>");
             }
@@ -157,28 +134,6 @@ export default class App extends React.Component {
         
         //Add GeoJson to Map and add Attribution
         geojson = L.geoJson(geoJsonFeature, {
-            // Set default style
-        //     'style': function () {
-        //         return {
-        //             'color': 'blue',
-        //         }
-        //     }
-        // }).on('click', function (e) {
-        //     var layer = e.target;
-        //     if (selected) {
-        //         e.target.resetStyle(selected)
-        //     }
-        //     selected = e.layer
-        //     selected.bringToFront()
-        //     selected.setStyle({
-        //         'color': 'red'
-        //     })
-        //     debugger;
-
-        // layer._layers = Arreglo de layers
-        // Cada layer tiene un feature.properties...
-
-        // info.update(layer._layers);
             style: featureStyle,
             onEachFeature: onEachFeature
         }).addTo(map);
