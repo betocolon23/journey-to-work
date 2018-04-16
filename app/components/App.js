@@ -6,6 +6,7 @@ import { Map, TileLayer, Marker, Popup, geoJSON, GeoJSON, geoJson } from 'leafle
 import DropDown from './DropDown';
 //css
 import css from '../styles.css';
+import { ImagePictureAsPdf } from 'material-ui';
 
 //data
 const geoJsonFeature = require('./geoJsonData.json')
@@ -40,12 +41,19 @@ export default class App extends React.Component {
         }
 
         info.update = function (props) {
-            // console.log(props);
+            console.log(props);
             if (props) {
-                var municipality_county_data = county_data.features.filter(function (data) {
-                    return data.properties['County Code Residence'] === props.geo_id;
+                // var municipality_county_data = county_data.features.filter(function (data) {
+                //     return data.properties['County Code Residence'] === props.geo_id;
+                // })
+                var county_names = county_data.features.map(function (data) {
+                    if (data.properties['County Code Residence'] === props.geo_id) {
+                        return data.properties['County Name_1'].trim();
+                    }
                 })
-                console.log(municipality_county_data);
+
+                // console.log(municipality_county_data);
+                console.log('county names: ', county_names.filter(Boolean));
                 this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
                     '<h4>' + props.Municipio + '</h4>' + '</h4>' + 'inbound / outbound' + '</h4>'
                     : 'Hover over a county');
@@ -92,6 +100,20 @@ export default class App extends React.Component {
             info.update();
         }
 
+        // var county_name = county_data.features.filter(function (data) {
+
+        //     // trim() elimina el/los ultimos espacios en un string
+        //     return data.properties['County Name'].trim() === 'Culebra';
+        // });
+
+        // var county_names = county_data.features.map(function (data) {
+        //     if (data.properties['County Code Residence'] === props.geo_id) {
+        //         return data.properties['County Name'].trim();
+        //     }
+        // });
+        
+        // console.log('COUNTY NAMES: ', county_names);
+
         //Color Clicked Municipio
         function clickedFeature(e) {
             var layer = e.target;
@@ -103,6 +125,11 @@ export default class App extends React.Component {
                 dashArray: '',
                 fillOpacity: 0.7
             });
+            
+            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                layer.bringToFront();
+            }
+
             info.update(layer.feature.properties)
         }
 
@@ -116,36 +143,44 @@ export default class App extends React.Component {
         function onEachFeature(feature, layer) {
             var selected;
             layer.on({
-                click: clickedFeature,
+                // click: clickedFeature,
                 // click: resetClicked,
-                // mouseover: highlightFeature, 
-                // mouseout: resetHighlight 
+                mouseover: highlightFeature, 
+                mouseout: resetHighlight 
             });
             if (feature.properties) {
-                layer.bindPopup("Chambea!!!");
+                layer.bindPopup("Workers in Commuting Flow:" + " " + "<div>Inbound to County</div>");
             }
         }
 
         var selected;
+        
         //Add GeoJson to Map and add Attribution
         geojson = L.geoJson(geoJsonFeature, {
             // Set default style
-            'style': function () {
-                return {
-                    'color': 'blue',
-                }
-            }
-        }).on('click', function (e) {
-            if (selected) {
-                e.target.resetStyle(selected)
-            }
-            selected = e.layer
-            selected.bringToFront()
-            selected.setStyle({
-                'color': 'red'
-            })
-            // style: featureStyle,
-            // onEachFeature: onEachFeature
+        //     'style': function () {
+        //         return {
+        //             'color': 'blue',
+        //         }
+        //     }
+        // }).on('click', function (e) {
+        //     var layer = e.target;
+        //     if (selected) {
+        //         e.target.resetStyle(selected)
+        //     }
+        //     selected = e.layer
+        //     selected.bringToFront()
+        //     selected.setStyle({
+        //         'color': 'red'
+        //     })
+        //     debugger;
+
+        // layer._layers = Arreglo de layers
+        // Cada layer tiene un feature.properties...
+
+        // info.update(layer._layers);
+            style: featureStyle,
+            onEachFeature: onEachFeature
         }).addTo(map);
 
         map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census</a>');
@@ -177,3 +212,5 @@ export default class App extends React.Component {
         )
     }
 }
+
+
