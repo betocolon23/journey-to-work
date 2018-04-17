@@ -23,6 +23,7 @@ export default class App extends React.Component {
 
     componentDidMount() {
         var map = L.map('map').setView([18.2208, -66.3500], 9);
+        var county_names;
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -40,12 +41,13 @@ export default class App extends React.Component {
         info.update = function (props) {
             console.log(props);
             if (props) {
-                var county_names = county_data.features.map(function (data) {
-                    if (data.properties['County Code Residence'] === props.geo_id) {
-                        return data.properties['County Name_1'].trim(); 
+                county_names = county_data.features.map(function (feature) {
+                    if (feature.properties['County Code Residence'] === props.geo_id) {
+                        return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow']]; 
                         //Add Workers Commuting Flow
                     }
                 }); 
+                county_names = county_names.filter(Boolean);
                 console.log('county names: ', county_names.filter(Boolean));
             }
             this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
@@ -113,6 +115,8 @@ export default class App extends React.Component {
             }
 
             info.update(layer.feature.properties)
+
+            layer.bindPopup("Workers in Commuting Flow:" + county_names + "<div>Inbound to County</div>");
         }
 
         //On Each Feature apply following function: 
@@ -124,10 +128,12 @@ export default class App extends React.Component {
                 // mouseout: resetHighlight 
             });
 
+            
+
             //Añadir County Data --- Coummuting Work === geo_id
-            if (feature.properties) {
-                layer.bindPopup("Workers in Commuting Flow:" + " " + "<div>Inbound to County</div>");
-            }
+            // if (feature.properties) {
+            //     layer.bindPopup("Workers in Commuting Flow:" + county_names + "<div>Inbound to County</div>");
+            // }
         }
 
         var selected;
