@@ -7,6 +7,7 @@ import DropDown from './DropDown';
 //css
 import css from '../styles.css';
 import { ImagePictureAsPdf } from 'material-ui';
+import { debug } from 'util';
 
 //data
 const geoJsonFeature = require('./geoJsonData.json')
@@ -39,22 +40,21 @@ export default class App extends React.Component {
         }
 
         info.update = function (props) {
-            console.log(props);
+            // console.log(props);
             if (props) {
                 county_names = county_data.features.map(function (feature) {
                     if (feature.properties['County Code Residence'] === props.geo_id) {
-                        return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow']]; 
+                        return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow']];
                         //Add Workers Commuting Flow
                     }
-                }); 
+                });
                 county_names = county_names.filter(Boolean);
-                console.log('county names: ', county_names.filter(Boolean));
+                // console.log('county names: ', county_names.filter(Boolean));
             }
             this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
-                '<h4>' + props.Municipio + '</h4>' + '</h4>' + 'inbound / outbound' + '</h4>'
+                '<h4>' + props.Municipio + '</h4>' + '</br>' + county_names + '</br>'
                 : 'Hover over a county');
         };
-
         info.addTo(map);
 
         //Add Feature Style
@@ -84,6 +84,7 @@ export default class App extends React.Component {
                 layer.bringToFront();
             }
             info.update(layer.feature.properties);
+            // layer.bindPopup("Workers in Commuting Flow:" + "<div>Inbound to County</div>" + county_names + '</br>');
         }
 
         var geojson;
@@ -94,50 +95,37 @@ export default class App extends React.Component {
             info.update();
         }
 
-
-        //Funcion para cambiar de color cada layer de acuerdo al municipio seleccionado: 
-
-
         //Color Clicked Municipio
         function clickedFeature(e) {
             var layer = e.target;
 
             layer.setStyle({
-                fillColor: 'red',
+                fillColor: 'green',
                 weight: 5,
                 color: '#666',
                 dashArray: '',
                 fillOpacity: 0.7
             });
-            
+
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
             }
 
             info.update(layer.feature.properties)
 
-            layer.bindPopup("Workers in Commuting Flow:" + county_names + "<div>Inbound to County</div>");
+            // layer.bindPopup("Workers in Commuting Flow:" + "<div>Inbound to County</div>" + county_names + '</br>');
         }
 
         //On Each Feature apply following function: 
         function onEachFeature(feature, layer) {
             var selected;
             layer.on({
-                click: clickedFeature,
-                // mouseover: highlightFeature, 
-                // mouseout: resetHighlight 
+                // click: clickedFeature,
+                mouseover: highlightFeature,
+                mouseout: resetHighlight
             });
-
-            
-
-            //Añadir County Data --- Coummuting Work === geo_id
-            // if (feature.properties) {
-            //     layer.bindPopup("Workers in Commuting Flow:" + county_names + "<div>Inbound to County</div>");
-            // }
         }
 
-        var selected;
-        
         //Add GeoJson to Map and add Attribution
         geojson = L.geoJson(geoJsonFeature, {
             style: featureStyle,
@@ -145,6 +133,8 @@ export default class App extends React.Component {
         }).addTo(map);
 
         map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census</a>');
+
+        console.log(county_names);
     }
 
     //Para el dropdown list de geoJsonFeature - Sacarlos del GEOJSON
