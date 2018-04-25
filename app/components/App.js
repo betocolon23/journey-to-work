@@ -97,7 +97,24 @@ export default class App extends React.Component {
 
         //Color Clicked Municipio
         function clickedFeature(e) {
+            
             var layer = e.target;
+            info.update(layer.feature.properties)
+            console.log(e);
+            for (var key in map._layers) {
+                for (var i = 0; i < county_names.length; i++) {
+                    if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_names[i][0]) {
+                        map._layers[key].setStyle({
+                            fillColor: 'green',
+                            weight: 5,
+                            color: '#666',
+                            dashArray: '',
+                            fillOpacity: 0.7
+                        });
+                    }
+                } 
+                console.log(key);
+            }
 
             layer.setStyle({
                 fillColor: 'green',
@@ -111,7 +128,7 @@ export default class App extends React.Component {
                 layer.bringToFront();
             }
 
-            info.update(layer.feature.properties)
+            
 
             // layer.bindPopup("Workers in Commuting Flow:" + "<div>Inbound to County</div>" + county_names + '</br>');
         }
@@ -120,9 +137,9 @@ export default class App extends React.Component {
         function onEachFeature(feature, layer) {
             var selected;
             layer.on({
-                // click: clickedFeature,
-                mouseover: highlightFeature,
-                mouseout: resetHighlight
+                click: clickedFeature,
+                // mouseover: highlightFeature,
+                // mouseout: resetHighlight
             });
         }
 
@@ -134,7 +151,9 @@ export default class App extends React.Component {
 
         map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census</a>');
 
-        console.log(county_names);
+        
+    //    map._layers = objecto con los 'layers'. La llave(Key) es el layer_id.
+
     }
 
     //Para el dropdown list de geoJsonFeature - Sacarlos del GEOJSON
