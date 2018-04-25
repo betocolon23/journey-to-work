@@ -25,12 +25,12 @@ export default class App extends React.Component {
     componentDidMount() {
         var map = L.map('map').setView([18.2208, -66.3500], 9);
         var county_names;
+        var geojson;
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
         }).addTo(map);
 
-        //control that show state info on hover
         var info = L.control();
 
         info.onAdd = function (map) {
@@ -40,24 +40,20 @@ export default class App extends React.Component {
         }
 
         info.update = function (props) {
-            // console.log(props);
             if (props) {
                 county_names = county_data.features.map(function (feature) {
                     if (feature.properties['County Code Residence'] === props.geo_id) {
                         return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow']];
-                        //Add Workers Commuting Flow
                     }
                 });
                 county_names = county_names.filter(Boolean);
-                // console.log('county names: ', county_names.filter(Boolean));
             }
             this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
-                '<h4>' + props.Municipio + '</h4>' + '</br>' + county_names + '</br>'
-                : 'Hover over a county');
+                '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div class=array-county>' + county_names+ '</div>' + '</br>'
+                : 'Click over a county');
         };
         info.addTo(map);
 
-        //Add Feature Style
         function featureStyle(feature) {
             return {
                 fillColor: 'blue',
@@ -68,39 +64,32 @@ export default class App extends React.Component {
             };
         }
 
-        //Highlight Each Feature 
+
         function highlightFeature(e) {
             var layer = e.target;
 
-            layer.setStyle({
-                fillColor: 'red',
-                weight: 5,
-                color: 'gray',
-                dashArray: '',
-                fillOpacity: 0.7
-            });
+            // layer.setStyle({
+            //     fillColor: 'red',
+            //     weight: 5,
+            //     color: 'gray',
+            //     dashArray: '',
+            //     fillOpacity: 0.7
+            // });
 
-            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-                layer.bringToFront();
-            }
+            // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            //     layer.bringToFront();
+            // }
             info.update(layer.feature.properties);
-            // layer.bindPopup("Workers in Commuting Flow:" + "<div>Inbound to County</div>" + county_names + '</br>');
         }
 
-        var geojson;
-
-        //Reset Higlight
         function resetHighlight(e) {
             geojson.resetStyle(e.target);
             info.update();
         }
 
-        //Color Clicked Municipio
         function clickedFeature(e) {
-            
             var layer = e.target;
             info.update(layer.feature.properties)
-            console.log(e);
             for (var key in map._layers) {
                 for (var i = 0; i < county_names.length; i++) {
                     if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_names[i][0]) {
@@ -113,50 +102,30 @@ export default class App extends React.Component {
                         });
                     }
                 } 
-                console.log(key);
             }
-
-            layer.setStyle({
-                fillColor: 'green',
-                weight: 5,
-                color: '#666',
-                dashArray: '',
-                fillOpacity: 0.7
-            });
 
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
             }
-
-            
-
-            // layer.bindPopup("Workers in Commuting Flow:" + "<div>Inbound to County</div>" + county_names + '</br>');
         }
 
-        //On Each Feature apply following function: 
         function onEachFeature(feature, layer) {
-            var selected;
             layer.on({
                 click: clickedFeature,
-                // mouseover: highlightFeature,
+                mouseover: highlightFeature,
                 // mouseout: resetHighlight
             });
         }
 
-        //Add GeoJson to Map and add Attribution
         geojson = L.geoJson(geoJsonFeature, {
             style: featureStyle,
             onEachFeature: onEachFeature
         }).addTo(map);
 
         map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census</a>');
-
-        
     //    map._layers = objecto con los 'layers'. La llave(Key) es el layer_id.
-
     }
 
-    //Para el dropdown list de geoJsonFeature - Sacarlos del GEOJSON
     handleChangeMunicipio(event, index, value) {
         this.setState({ selected: value });
     }

@@ -32,6 +32,11 @@ html {
     margin-bottom: 1%;
 }
 
+.array-county {
+    display: flex;
+    flex-direction: column;
+}
+
 
 
 
