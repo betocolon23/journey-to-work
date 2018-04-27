@@ -56,7 +56,7 @@ export default class App extends React.Component {
 
         function featureStyle(feature) {
             return {
-                fillColor: 'blue',
+                fillColor: '#FFEDA0',
                 color: 'grey',
                 opacity: 1,
                 dashArray: '3',
@@ -79,48 +79,43 @@ export default class App extends React.Component {
             // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
             //     layer.bringToFront();
             // }
-            info.update(layer.feature.properties);
+            // info.update(layer.feature.properties);
         }
+
+        var clickedCounty;
 
         function clickedFeature(e) {
             var layer = e.target;
             info.update(layer.feature.properties)
-            for (var key in map._layers) {
-                for (var i = 0; i < county_names.length; i++) {
-                    if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_names[i][0]) {
-                        map._layers[key].setStyle({
-                            fillColor: 'green',
-                            weight: 5,
-                            color: '#666',
-                            dashArray: '',
-                            fillOpacity: 0.7
-                        });
+                for (var key in map._layers) {
+                    for (var i = 0; i < county_names.length; i++) {
+                        if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_names[i][0]) {
+                            map._layers[key].setStyle({
+                                fillColor: '#FD8D3C',
+                                weight: 5,
+                                color: '#666',
+                                dashArray: '',
+                                fillOpacity: 0.7
+                            });
+                        }
                     }
+                    layer.setStyle({
+                        fillColor: '#BD0026',
+                                weight: 5,
+                                color: '#666',
+                                dashArray: '',
+                                fillOpacity: 0.7
+                    });
                 }
-                layer.setStyle({
-                    fillColor: 'blue',
-                            weight: 5,
-                            color: '#666',
-                            dashArray: '',
-                            fillOpacity: 0.7
-                });
-            }
-
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
             }
-        }
-
-        function resetClick(e) {
-            geojson.resetStyle(e.target);
-            info.update();
         }
 
         function onEachFeature(feature, layer) {
             layer.on({
                 click: clickedFeature,
                 // mouseover: highlightFeature,
-                // mouseout: resetClick
             });
         }
 
