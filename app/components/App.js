@@ -49,7 +49,7 @@ export default class App extends React.Component {
                 county_names = county_names.filter(Boolean);
             }
             this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
-                '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div class=array-county>' + county_names+ '</div>' + '</br>'
+                '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div class=array-county>' + county_names + '</div>' + '</br>'
                 : 'Click over a county');
         };
         info.addTo(map);
@@ -82,11 +82,6 @@ export default class App extends React.Component {
             info.update(layer.feature.properties);
         }
 
-        function resetHighlight(e) {
-            geojson.resetStyle(e.target);
-            info.update();
-        }
-
         function clickedFeature(e) {
             var layer = e.target;
             info.update(layer.feature.properties)
@@ -101,7 +96,14 @@ export default class App extends React.Component {
                             fillOpacity: 0.7
                         });
                     }
-                } 
+                }
+                layer.setStyle({
+                    fillColor: 'blue',
+                            weight: 5,
+                            color: '#666',
+                            dashArray: '',
+                            fillOpacity: 0.7
+                });
             }
 
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
@@ -109,11 +111,16 @@ export default class App extends React.Component {
             }
         }
 
+        function resetClick(e) {
+            geojson.resetStyle(e.target);
+            info.update();
+        }
+
         function onEachFeature(feature, layer) {
             layer.on({
                 click: clickedFeature,
-                mouseover: highlightFeature,
-                // mouseout: resetHighlight
+                // mouseover: highlightFeature,
+                // mouseout: resetClick
             });
         }
 
@@ -123,7 +130,6 @@ export default class App extends React.Component {
         }).addTo(map);
 
         map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census</a>');
-    //    map._layers = objecto con los 'layers'. La llave(Key) es el layer_id.
     }
 
     handleChangeMunicipio(event, index, value) {
