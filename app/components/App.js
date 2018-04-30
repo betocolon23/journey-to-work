@@ -2,6 +2,7 @@
 import React from 'react';
 import Paper from 'material-ui/Paper';
 import { Map, TileLayer, Marker, Popup, geoJSON, GeoJSON, geoJson } from 'leaflet';
+import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 //components
 import DropDown from './DropDown';
 //css
@@ -13,19 +14,33 @@ import { debug } from 'util';
 const geoJsonFeature = require('./geoJsonData.json')
 const county_data = require('./county-data')
 
+const styles = {
+    block: {
+        maxWidth: 250,
+    },
+    radioButton: {
+        marginBottom: 16,
+    },
+};
+
 export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            "selected": []
+            "selected": [],
+            selectedOption: 'inbound'
         }
-        this.handleChangeMunicipio.bind(this);
+        this.handleChangeMunicipio = this.handleChangeMunicipio.bind(this);
+        this.handleOptionChange = this.handleOptionChange.bind(this);
     }
 
     componentDidMount() {
         var map = L.map('map').setView([18.2208, -66.3500], 9);
-        var county_names;
+        var county_inbound;
+        var county_outbound;
         var geojson;
+        var newSelected = this.state.selectedOption;
+
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -41,15 +56,27 @@ export default class App extends React.Component {
 
         info.update = function (props) {
             if (props) {
-                county_names = county_data.features.map(function (feature) {
-                    if (feature.properties['County Code Residence'] === props.geo_id) {
-                        return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow']];
-                    }
-                });
-                county_names = county_names.filter(Boolean);
+                if (newSelected === 'inbound') {
+                    county_inbound = county_data.features.map(function (feature) {
+                        if (feature.properties['County Code Residence'] === props.geo_id) {
+                            return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow']];
+                        }
+                    });
+                    county_inbound = county_inbound.filter(Boolean);
+                    console.log(newSelected);
+                }
+                else {
+                    county_outbound = county_data.features.map(function (feature) {
+                        if (feature.properties['County Code Residence'] === props.geo_id) {
+                            return feature.properties['County Name'].trim()
+                        }
+                    });
+                    county_outbound = county_outbound.filter(Boolean);
+                    console.log(county_outbound);
+                }
             }
             this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
-                '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div class=array-county>' + county_names + '</div>' + '</br>'
+                '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div class=array-county>' + county_inbound + '</div>' + '</br>'
                 : 'Click over a county');
         };
         info.addTo(map);
@@ -64,49 +91,29 @@ export default class App extends React.Component {
             };
         }
 
-
-        function highlightFeature(e) {
-            var layer = e.target;
-
-            // layer.setStyle({
-            //     fillColor: 'red',
-            //     weight: 5,
-            //     color: 'gray',
-            //     dashArray: '',
-            //     fillOpacity: 0.7
-            // });
-
-            // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            //     layer.bringToFront();
-            // }
-            // info.update(layer.feature.properties);
-        }
-
-        var clickedCounty;
-
         function clickedFeature(e) {
             var layer = e.target;
             info.update(layer.feature.properties)
-                for (var key in map._layers) {
-                    for (var i = 0; i < county_names.length; i++) {
-                        if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_names[i][0]) {
-                            map._layers[key].setStyle({
-                                fillColor: '#FD8D3C',
-                                weight: 5,
-                                color: '#666',
-                                dashArray: '',
-                                fillOpacity: 0.7
-                            });
-                        }
+            for (var key in map._layers) {
+                for (var i = 0; i < county_inbound.length; i++) {
+                    if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_inbound[i][0]) {
+                        map._layers[key].setStyle({
+                            fillColor: '#FD8D3C',
+                            weight: 5,
+                            color: '#666',
+                            dashArray: '',
+                            fillOpacity: 0.7
+                        });
                     }
-                    layer.setStyle({
-                        fillColor: '#BD0026',
-                                weight: 5,
-                                color: '#666',
-                                dashArray: '',
-                                fillOpacity: 0.7
-                    });
                 }
+                layer.setStyle({
+                    fillColor: '#BD0026',
+                    weight: 5,
+                    color: '#666',
+                    dashArray: '',
+                    fillOpacity: 0.7
+                });
+            }
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
             }
@@ -114,8 +121,7 @@ export default class App extends React.Component {
 
         function onEachFeature(feature, layer) {
             layer.on({
-                click: clickedFeature,
-                // mouseover: highlightFeature,
+                click: clickedFeature
             });
         }
 
@@ -131,7 +137,12 @@ export default class App extends React.Component {
         this.setState({ selected: value });
     }
 
+    handleOptionChange(changeEvent) {
+        this.setState({ selectedOption: changeEvent.target.value });
+    }
+
     render() {
+        console.log(this.state.selectedOption);
         return (
             <Paper>
                 <div className={'full-container'}>
@@ -143,9 +154,31 @@ export default class App extends React.Component {
                             geoJsonFeature={geoJsonFeature}
                             county={county_data}
                         />
+                        <div className="radio-container">
+                            <div className="radio">
+                                <label>
+                                    <input
+                                        type="radio" value="inbound"
+                                        checked={this.state.selectedOption === 'inbound'}
+                                        onChange={this.handleOptionChange}
+                                    />
+                                    Inbound
+                                </label>
+                            </div>
+                            <div className="radio">
+                                <label>
+                                    <input
+                                        type="radio" value="outbound"
+                                        checked={this.state.selectedOption === 'outbound'}
+                                        onChange={this.handleOptionChange}
+                                    />
+                                    Outbound
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div className={"bottom-container"}>
-                        <div id="map"></div>
+                        <div id='map'></div>
                     </div>
                 </div>
             </Paper>
