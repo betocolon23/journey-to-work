@@ -9,6 +9,10 @@ html {
     flex-direction: column;
 }
 
+.title {
+    padding: 10px;
+}
+
 .top-container {
     display: flex;
     flex-direction: row;
@@ -41,6 +45,10 @@ html {
     flex-direction: column;
 }
 
-
+@media only screen and (max-width: 1000px) {
+    .top-container {
+        flex-direction: column;
+    }
+}
 
 

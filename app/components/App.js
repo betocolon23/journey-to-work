@@ -7,7 +7,6 @@ import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import DropDown from './DropDown';
 //css
 import css from '../styles.css';
-import { ImagePictureAsPdf } from 'material-ui';
 import { debug } from 'util';
 
 //data
@@ -66,7 +65,7 @@ export default class App extends React.Component {
                     });
                     county_outbound = county_outbound.filter(Boolean);
                     console.log(county_outbound);
-                    this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
+                    this._div.innerHTML =  (props ?
                         '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div>' + county_outbound + '</div>' + '</br>'
                         : 'Click over a county');
                 }
@@ -148,9 +147,14 @@ export default class App extends React.Component {
             }
         }
 
+        function resetFeature(e) {
+            geojson.resetStyle(e.target);
+        }
+
         function onEachFeature(feature, layer) {
             layer.on({
-                click: clickedFeature
+                click: clickedFeature, 
+                // click: resetFeature
             });
         }
 
@@ -171,10 +175,10 @@ export default class App extends React.Component {
     }
 
     render() {
-        console.log(this.state.selectedOption);
         return (
             <Paper>
                 <div className={'full-container'}>
+                <div className={'title'}>Puerto Rico Journey to Work Map </div>
                     <div className={"top-container"}>
                         <DropDown
                             className={"drop-down"}
