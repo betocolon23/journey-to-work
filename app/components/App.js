@@ -28,7 +28,7 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             "selected": [],
-            selectedOption: 'inbound'
+            selectedOption: 'outbound'
         }
         this.handleChangeMunicipio = this.handleChangeMunicipio.bind(this);
         this.handleOptionChange = this.handleOptionChange.bind(this);
@@ -40,6 +40,8 @@ export default class App extends React.Component {
         var county_outbound;
         var geojson;
         var newSelected = this.state.selectedOption;
+        var inbound = document.getElementById('inbound');
+        var outbound = document.getElementById('outbound');
 
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
@@ -56,28 +58,31 @@ export default class App extends React.Component {
 
         info.update = function (props) {
             if (props) {
-                if (newSelected === 'inbound') {
-                    county_inbound = county_data.features.map(function (feature) {
+                if (outbound.checked) {
+                    county_outbound = county_data.features.map(function (feature) {
                         if (feature.properties['County Code Residence'] === props.geo_id) {
                             return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow']];
                         }
                     });
-                    county_inbound = county_inbound.filter(Boolean);
-                    console.log(newSelected);
-                }
-                else {
-                    county_outbound = county_data.features.map(function (feature) {
-                        if (feature.properties['County Code Residence'] === props.geo_id) {
-                            return feature.properties['County Name'].trim()
-                        }
-                    });
                     county_outbound = county_outbound.filter(Boolean);
                     console.log(county_outbound);
+                    this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
+                        '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div>' + county_outbound + '</div>' + '</br>'
+                        : 'Click over a county');
+                }
+                else {
+                    county_inbound = county_data.features.map(function (feature) {
+                        if (feature.properties['County Code Place of Work'] === props.geo_id) {
+                            return [feature.properties['County Name'].trim(), feature.properties['Workers in Commuting Flow']];
+                        }
+                    });
+                    county_inbound = county_inbound.filter(Boolean);
+                    console.log(county_inbound);
+                    this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
+                        '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div>' + county_inbound + '</div>' + '</br>'
+                        : 'Click over a county');
                 }
             }
-            this._div.innerHTML = '<h3>Puerto Rico Journey to Work Map</h3>' + (props ?
-                '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div class=array-county>' + county_inbound + '</div>' + '</br>'
-                : 'Click over a county');
         };
         info.addTo(map);
 
@@ -93,26 +98,50 @@ export default class App extends React.Component {
 
         function clickedFeature(e) {
             var layer = e.target;
-            info.update(layer.feature.properties)
-            for (var key in map._layers) {
-                for (var i = 0; i < county_inbound.length; i++) {
-                    if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_inbound[i][0]) {
-                        map._layers[key].setStyle({
-                            fillColor: '#FD8D3C',
-                            weight: 5,
-                            color: '#666',
-                            dashArray: '',
-                            fillOpacity: 0.7
-                        });
+            info.update(layer.feature.properties);
+            if (outbound.checked) {
+                for (var key in map._layers) {
+                    for (var i = 0; i < county_outbound.length; i++) {
+                        if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_outbound[i][0]) {
+                            map._layers[key].setStyle({
+                                fillColor: '#FD8D3C',
+                                weight: 5,
+                                color: '#666',
+                                dashArray: '',
+                                fillOpacity: 0.7
+                            });
+                        }
                     }
+                    layer.setStyle({
+                        fillColor: '#BD0026',
+                        weight: 5,
+                        color: '#666',
+                        dashArray: '',
+                        fillOpacity: 0.7
+                    });
                 }
-                layer.setStyle({
-                    fillColor: '#BD0026',
-                    weight: 5,
-                    color: '#666',
-                    dashArray: '',
-                    fillOpacity: 0.7
-                });
+            }
+            else if (inbound.checked) {
+                for (var key in map._layers) {
+                    for (var i = 0; i < county_inbound.length; i++) {
+                        if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_inbound[i][0]) {
+                            map._layers[key].setStyle({
+                                fillColor: '#FC4E2A',
+                                weight: 5,
+                                color: '#666',
+                                dashArray: '',
+                                fillOpacity: 0.7
+                            });
+                        }
+                    }
+                    layer.setStyle({
+                        fillColor: '#800026',
+                        weight: 5,
+                        color: '#666',
+                        dashArray: '',
+                        fillOpacity: 0.7
+                    });
+                }
             }
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
@@ -158,21 +187,23 @@ export default class App extends React.Component {
                             <div className="radio">
                                 <label>
                                     <input
-                                        type="radio" value="inbound"
-                                        checked={this.state.selectedOption === 'inbound'}
+                                        type="radio" value="outbound"
+                                        checked={this.state.selectedOption === 'outbound'}
                                         onChange={this.handleOptionChange}
+                                        id='outbound'
                                     />
-                                    Inbound
+                                    Outbound
                                 </label>
                             </div>
                             <div className="radio">
                                 <label>
                                     <input
-                                        type="radio" value="outbound"
-                                        checked={this.state.selectedOption === 'outbound'}
+                                        type="radio" value="inbound"
+                                        checked={this.state.selectedOption === 'inbound'}
                                         onChange={this.handleOptionChange}
+                                        id='inbound'
                                     />
-                                    Outbound
+                                    Inbound
                                 </label>
                             </div>
                         </div>
