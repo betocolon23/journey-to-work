@@ -42,7 +42,7 @@ export default class App extends React.Component {
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
 
-        
+
 
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
@@ -59,7 +59,7 @@ export default class App extends React.Component {
 
         info.update = function (props) {
             if (props) {
-   
+
                 if (outbound.checked) {
                     county_outbound = county_data.features.map(function (feature) {
                         if (feature.properties['County Code Residence'] === props.geo_id) {
@@ -67,9 +67,11 @@ export default class App extends React.Component {
                         }
                     });
                     county_outbound = county_outbound.filter(Boolean);
-                    console.log(county_outbound); 
-                    this._div.innerHTML =  (props ?
-                        '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div>' + county_outbound + '</div>' + '</br>'
+                    console.log(county_outbound);
+
+                    this._div.innerHTML = (props ?
+                        '<h4>' + props.Municipio + '</h4>'
+                        // county_outbound + '</div>' + '</br>'
                         : 'Click over a county');
                 }
                 else {
@@ -80,8 +82,9 @@ export default class App extends React.Component {
                     });
                     county_inbound = county_inbound.filter(Boolean);
                     console.log(county_inbound);
-                    this._div.innerHTML =  (props ?
-                        '<h4>' + props.Municipio + '</h4>' + '</br>' + '<div>' + county_inbound + '</div>' + '</br>'
+                    this._div.innerHTML = (props ?
+                        '<h4>' + props.Municipio + '</h4>'
+                        //  + county_inbound + '</div>' + '</br>'
                         : 'Click over a county');
                 }
             }
@@ -105,19 +108,20 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_outbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_outbound[i][0]) {
+                            console.log(county_outbound[i][1]);
                             map._layers[key].setStyle({
                                 fillColor: '#FD8D3C',
-                                weight: 5,
+                                weight: 1,
                                 color: '#666',
                                 dashArray: '',
                                 fillOpacity: 0.7,
-                                fillColor: getColor(county_outbound[1])
+                                fillColor: getColor(county_outbound[i][1])
                             });
                         }
                     }
                     layer.setStyle({
-                        fillColor: '#BD0026',
-                        weight: 5,
+                        // fillColor: '#99ccff',
+                        weight: 3,
                         color: '#666',
                         dashArray: '',
                         fillOpacity: 0.7
@@ -128,19 +132,20 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_inbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_inbound[i][0]) {
+                            console.log(county_inbound[i][1]);
                             map._layers[key].setStyle({
                                 fillColor: '#FC4E2A',
-                                weight: 5,
+                                weight: 1,
                                 color: '#666',
                                 dashArray: '',
                                 fillOpacity: 0.7,
-                                fillColor: getColor(county_inbound[1])
+                                fillColor: getColor(county_inbound[i][1])
                             });
                         }
                     }
                     layer.setStyle({
-                        fillColor: '#800026',
-                        weight: 5,
+                        // fillColor: '#99ccff',
+                        weight: 3,
                         color: '#666',
                         dashArray: '',
                         fillOpacity: 0.7
@@ -158,7 +163,7 @@ export default class App extends React.Component {
 
         function onEachFeature(feature, layer) {
             layer.on({
-                click: clickedFeature, 
+                click: clickedFeature,
                 // click: resetFeature
             });
         }
@@ -171,39 +176,42 @@ export default class App extends React.Component {
         map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census</a>');
 
         function getColor(d) {
-            return d > 100000 ? '#800026' :
-                    d > 10000  ? '#BD0026' :
-                    d > 7500  ? '#E31A1C' :
-                    d > 5000  ? '#FC4E2A' :
-                    d > 2500   ? '#FD8D3C' :
-                    d > 1000   ? '#FEB24C' :
-                    d > 500   ? '#FED976' :
-                                '#FFEDA0';
+            return d > 100000 ? '#331a00' :
+                d > 10000 ? '#663300' :
+                d > 7500 ? '#994d00' :
+                d > 5000 ? '#cc6600' :
+                d > 2500 ? '#ff8000' :
+                d > 1000 ? '#ff9933' :
+                d > 500 ? '#e6e6ff' :
+                d > 250 ? '#ccccff' :
+                d > 100 ? '#9999ff' :
+                d > 10 ? '#4d4dff' :
+                        '#000080';
         }
 
-        var legend = L.control({position: 'bottomright'});
+        var legend = L.control({ position: 'bottomright' });
 
-	    legend.onAdd = function (map) {
+        legend.onAdd = function (map) {
 
-		var div = L.DomUtil.create('div', 'info legend'),
-			grades = [0, 500, 1000, 2500, 5000, 7500, 10000, 100000],
-			labels = [],
-			from, to;
+            var div = L.DomUtil.create('div', 'info legend'),
+                grades = [0, 10, 100, 250, 500, 1000, 2500, 5000, 7500, 10000, 100000],
+                labels = [],
+                from, to;
 
-		for (var i = 0; i < grades.length; i++) {
-			from = grades[i];
-			to = grades[i + 1];
+            for (var i = 0; i < grades.length; i++) {
+                from = grades[i];
+                to = grades[i + 1];
 
-			labels.push(
-				'<i style="background:' + getColor(from + 1) + '"></i> ' +
-				from + (to ? '&ndash;' + to : '+'));
-		}
+                labels.push(
+                    '<i style="background:' + getColor(from + 1) + '"></i> ' +
+                    from + (to ? '&ndash;' + to : '+'));
+            }
 
-		div.innerHTML = labels.join('<br>');
-		return div;
-	};
+            div.innerHTML = labels.join('<br>');
+            return div;
+        };
 
-	legend.addTo(map);
+        legend.addTo(map);
     }
 
     handleChangeMunicipio(event, index, value) {
@@ -218,7 +226,7 @@ export default class App extends React.Component {
         return (
             <Paper>
                 <div className={'full-container'}>
-                <div className={'title'}>Puerto Rico Journey to Work Map </div>
+                    <div className={'title'}>Puerto Rico Journey to Work Map </div>
                     <div className={"top-container"}>
                         <DropDown
                             className={"drop-down"}
@@ -260,5 +268,4 @@ export default class App extends React.Component {
         )
     }
 }
-
 
