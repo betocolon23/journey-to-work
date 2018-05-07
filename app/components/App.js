@@ -3,6 +3,7 @@ import React from 'react';
 import Paper from 'material-ui/Paper';
 import { Map, TileLayer, Marker, Popup, geoJSON, GeoJSON, geoJson } from 'leaflet';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
+import geostats from '../lib/geostats';
 //components
 import DropDown from './DropDown';
 //css
@@ -41,9 +42,12 @@ export default class App extends React.Component {
         var newSelected = this.state.selectedOption;
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
+        var county_max;
+        var county_min;
+        var county_average; 
 
-
-
+        // var prueaba = geostats.min([0.1, 1.5, 2.2, 3.5, 7.1]);
+        // console.log(prueba);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -67,7 +71,7 @@ export default class App extends React.Component {
                         }
                     });
                     county_outbound = county_outbound.filter(Boolean);
-                    console.log(county_outbound);
+                    // console.log(county_outbound);
 
                     this._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
@@ -81,7 +85,7 @@ export default class App extends React.Component {
                         }
                     });
                     county_inbound = county_inbound.filter(Boolean);
-                    console.log(county_inbound);
+                    // console.log(county_inbound);
                     this._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
                         //  + county_inbound + '</div>' + '</br>'
@@ -108,7 +112,9 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_outbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_outbound[i][0]) {
-                            console.log(county_outbound[i][1]);
+                            // console.log(county_outbound);
+                            // console.log(Number(county_outbound[i][1]));
+                            
                             map._layers[key].setStyle({
                                 fillColor: '#FD8D3C',
                                 weight: 1,
@@ -177,7 +183,7 @@ export default class App extends React.Component {
 
         function getColor(d) {
             return d > 100000 ? '#331a00' :
-                d > 10000 ? '#663300' :
+                d > 35000 ? '#663300' :
                 d > 7500 ? '#994d00' :
                 d > 5000 ? '#cc6600' :
                 d > 2500 ? '#ff8000' :
@@ -194,7 +200,7 @@ export default class App extends React.Component {
         legend.onAdd = function (map) {
 
             var div = L.DomUtil.create('div', 'info legend'),
-                grades = [0, 10, 100, 250, 500, 1000, 2500, 5000, 7500, 10000, 100000],
+                grades = [0, 10, 100, 250, 500, 1000, 2500, 5000, 7500, 10000, 35000],
                 labels = [],
                 from, to;
 
