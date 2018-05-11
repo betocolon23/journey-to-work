@@ -3,7 +3,7 @@ import React from 'react';
 import Paper from 'material-ui/Paper';
 import { Map, TileLayer, Marker, Popup, geoJSON, GeoJSON, geoJson } from 'leaflet';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
-import geostats from '../lib/geostats';
+import {geostats} from '../lib/geostats';
 //components
 import DropDown from './DropDown';
 //css
@@ -42,12 +42,11 @@ export default class App extends React.Component {
         var newSelected = this.state.selectedOption;
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
-        var county_max;
-        var county_min;
-        var county_average; 
+        
 
-        // var prueaba = geostats.min([0.1, 1.5, 2.2, 3.5, 7.1]);
-        // console.log(prueba);
+        // var a1 = Array(12, 22, 5, 8, 43, 2, 34, 12, 34, 36, 5, 21, 23, 45);
+        //     serie1 = new geostats(a1);
+        //     document.write('<p>geostats.max() : ' + serie1.max() + '<\/p>');
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
