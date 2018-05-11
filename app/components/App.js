@@ -3,7 +3,7 @@ import React from 'react';
 import Paper from 'material-ui/Paper';
 import { Map, TileLayer, Marker, Popup, geoJSON, GeoJSON, geoJson } from 'leaflet';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
-import {geostats} from '../lib/geostats';
+import { CSVLink, CSVDownload } from 'react-csv';
 //components
 import DropDown from './DropDown';
 //css
@@ -14,6 +14,8 @@ import { debug } from 'util';
 const geoJsonFeature = require('./geoJsonData.json')
 const county_data = require('./county-data')
 
+
+
 const styles = {
     block: {
         maxWidth: 250,
@@ -22,6 +24,13 @@ const styles = {
         marginBottom: 16,
     },
 };
+
+const csvData = [
+    ['firstname', 'lastname', 'email'],
+    ['Ahmed', 'Tomi', 'ah@smthing.co.com'],
+    ['Raed', 'Labes', 'rl@smthing.co.com'],
+    ['Yezzi', 'Min l3b', 'ymin@cocococo.com']
+];
 
 export default class App extends React.Component {
     constructor(props) {
@@ -42,7 +51,6 @@ export default class App extends React.Component {
         var newSelected = this.state.selectedOption;
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
-        
 
         // var a1 = Array(12, 22, 5, 8, 43, 2, 34, 12, 34, 36, 5, 21, 23, 45);
         //     serie1 = new geostats(a1);
@@ -70,7 +78,7 @@ export default class App extends React.Component {
                         }
                     });
                     county_outbound = county_outbound.filter(Boolean);
-                    // console.log(county_outbound);
+                    console.log(county_outbound);
 
                     this._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
@@ -112,8 +120,8 @@ export default class App extends React.Component {
                     for (var i = 0; i < county_outbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_outbound[i][0]) {
                             // console.log(county_outbound);
-                            // console.log(Number(county_outbound[i][1]));
-                            
+                            console.log(county_outbound[i][1]);
+
                             map._layers[key].setStyle({
                                 fillColor: '#FD8D3C',
                                 weight: 1,
@@ -137,7 +145,8 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_inbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_inbound[i][0]) {
-                            console.log(county_inbound[i][1]);
+                            console.log(county_inbound);
+                            // console.log(county_inbound[i][1]);
                             map._layers[key].setStyle({
                                 fillColor: '#FC4E2A',
                                 weight: 1,
@@ -183,15 +192,15 @@ export default class App extends React.Component {
         function getColor(d) {
             return d > 100000 ? '#331a00' :
                 d > 35000 ? '#663300' :
-                d > 7500 ? '#994d00' :
-                d > 5000 ? '#cc6600' :
-                d > 2500 ? '#ff8000' :
-                d > 1000 ? '#ff9933' :
-                d > 500 ? '#e6e6ff' :
-                d > 250 ? '#ccccff' :
-                d > 100 ? '#9999ff' :
-                d > 10 ? '#4d4dff' :
-                        '#000080';
+                    d > 7500 ? '#994d00' :
+                        d > 5000 ? '#cc6600' :
+                            d > 2500 ? '#ff8000' :
+                                d > 1000 ? '#ff9933' :
+                                    d > 500 ? '#e6e6ff' :
+                                        d > 250 ? '#ccccff' :
+                                            d > 100 ? '#9999ff' :
+                                                d > 10 ? '#4d4dff' :
+                                                    '#000080';
         }
 
         var legend = L.control({ position: 'bottomright' });
@@ -233,13 +242,13 @@ export default class App extends React.Component {
                 <div className={'full-container'}>
                     <div className={'title'}>Puerto Rico Journey to Work Map </div>
                     <div className={"top-container"}>
-                        <DropDown
+                        {/* <DropDown
                             className={"drop-down"}
                             onChange={this.handleChangeMunicipio}
                             selected={this.state.selected}
                             geoJsonFeature={geoJsonFeature}
                             county={county_data}
-                        />
+                        /> */}
                         <div className="radio-container">
                             <div className="radio">
                                 <label>
@@ -264,11 +273,20 @@ export default class App extends React.Component {
                                 </label>
                             </div>
                         </div>
+                        <div className={"csv-class"}>
+                            <div className={'csv-link'}>
+                                <CSVLink data={csvData}>Download Map CSV</CSVLink>
+                            </div>
+                            <div className={'csv-link'}>
+                                <CSVLink data={csvData} >Download Selected County Data</CSVLink>
+                            </div>
+                        </div>
                     </div>
                     <div className={"bottom-container"}>
                         <div id='map'></div>
                     </div>
                 </div>
+
             </Paper>
         )
     }

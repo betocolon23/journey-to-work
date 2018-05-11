@@ -71,6 +71,13 @@ html {
     opacity: 0.7;
 }
 
+.csv-class {
+    display: flex;
+    flex-direction: column;
+    border: #555;
+    border-color: #555;
+}
+
 @media only screen and (max-width: 1000px) {
     .top-container {
         flex-direction: column;
