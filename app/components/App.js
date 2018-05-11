@@ -9,6 +9,7 @@ import DropDown from './DropDown';
 //css
 import css from '../styles.css';
 import { debug } from 'util';
+import geostats from '../../public/lib/geostats.js'
 
 //data
 const geoJsonFeature = require('./geoJsonData.json')
@@ -52,9 +53,11 @@ export default class App extends React.Component {
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
 
-        // var a1 = Array(12, 22, 5, 8, 43, 2, 34, 12, 34, 36, 5, 21, 23, 45);
-        //     serie1 = new geostats(a1);
-        //     document.write('<p>geostats.max() : ' + serie1.max() + '<\/p>');
+        var a2 = Array(12, 22, 5, 8, 43, 2, 34, 12, 34, 36, 5, 21, 23, 45);
+        var serie2 = new geostats(a2);
+            document.write('<p>geostats.max() : ' + serie2.min() + '<\/p>');
+         
+        console.log(a2);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
