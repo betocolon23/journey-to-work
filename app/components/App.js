@@ -9,12 +9,22 @@ import DropDown from './DropDown';
 //css
 import css from '../styles.css';
 import { debug } from 'util';
-import geostats from '../../public/lib/geostats.js'
+import geostats from '../../public/lib/geostats.js';
+import csv_data from './csvData.js';
 
 //data
 const geoJsonFeature = require('./geoJsonData.json')
 const county_data = require('./county-data')
+// const csvData = require('./csvData.js');
 
+const dataTest =[
+        ['County Code Residence', 'County Name', 'County Code Place of Work', 'County Name', 'Workers in Commuting Flow'],
+        ['72001', 'Adjuntas ', '72001', 'Adjuntas ', '2319'],
+        ['72001', 'Adjuntas ', '72013', 'Arecibo ', '20'],
+        ['72001', 'Adjuntas ', '72021', 'Bayamon ', '13'],
+        ['72001', 'Adjuntas ', '72023', 'Cabo Rojo ', '11'],
+        ['72001', 'Adjuntas ', '72025', 'Caguas ', '6']
+  ];
 
 
 const styles = {
@@ -26,12 +36,15 @@ const styles = {
     },
 };
 
-const csvData = [
-    ['firstname', 'lastname', 'email'],
-    ['Ahmed', 'Tomi', 'ah@smthing.co.com'],
-    ['Raed', 'Labes', 'rl@smthing.co.com'],
-    ['Yezzi', 'Min l3b', 'ymin@cocococo.com']
-];
+const prettyLink  = {
+    backgroundColor: '#fffff',
+    fontSize: 14,
+    fontWeight: 100,
+    height: 52,
+    padding: '5 5',
+    borderRadius: 1,
+    color: '#000'
+  };
 
 export default class App extends React.Component {
     constructor(props) {
@@ -53,11 +66,32 @@ export default class App extends React.Component {
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
 
-        var a2 = Array(12, 22, 5, 8, 43, 2, 34, 12, 34, 36, 5, 21, 23, 45);
-        var serie2 = new geostats(a2);
-            document.write('<p>geostats.max() : ' + serie2.min() + '<\/p>');
+        // var a2 = Array(12, 22, 5, 8, 43, 2, 34, 12, 34, 36, 5, 21, 23, 45);
+        // var serie2 = new geostats(a2);
+        // document.write('<p>geostats.max() : ' + serie2.max() + '<\/p>');
+
+        function nl2br(str, is_xhtml) {
+            var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br />' : '<br>';
+            return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
+        }
+        
+        var a5 = Array(0.1, 1.2, 3, 2.5, 1.6, 2.2, 3.1, 2.8, 1.1, 2.7, 7.1);
+
+        var serie = new geostats();
+        serie.setSerie(a5);
+        
+        var a = serie.getClassJenks(5);
+        str += '<strong>Classification Method : <\/strong>' + serie.method + " :\n";
+        str += '<div class="classes">';
+        var ranges = serie.ranges;
+        for (i = 0; i < ranges.length; i++) {
+            str += ranges[i] + "\n";
+        }
+        str += '<\/div>';
+
+        document.write('<p>' + nl2br(serie.info()) + '<\/p>');
+        document.write('<p>' + nl2br(str) + '<\/p>');
          
-        console.log(a2);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -73,7 +107,6 @@ export default class App extends React.Component {
 
         info.update = function (props) {
             if (props) {
-
                 if (outbound.checked) {
                     county_outbound = county_data.features.map(function (feature) {
                         if (feature.properties['County Code Residence'] === props.geo_id) {
@@ -209,6 +242,7 @@ export default class App extends React.Component {
         var legend = L.control({ position: 'bottomright' });
 
         legend.onAdd = function (map) {
+            
 
             var div = L.DomUtil.create('div', 'info legend'),
                 grades = [0, 10, 100, 250, 500, 1000, 2500, 5000, 7500, 10000, 35000],
@@ -278,10 +312,10 @@ export default class App extends React.Component {
                         </div>
                         <div className={"csv-class"}>
                             <div className={'csv-link'}>
-                                <CSVLink data={csvData}>Download Map CSV</CSVLink>
+                                <CSVLink data={dataTest} style={prettyLink} filename={"map-data.csv"}>Download Map CSV ⬇ </CSVLink>
                             </div>
                             <div className={'csv-link'}>
-                                <CSVLink data={csvData} >Download Selected County Data</CSVLink>
+                                <CSVLink data={dataTest} style={prettyLink} filename={"county-data.csv"}>Download Selected County CSV ⬇</CSVLink>
                             </div>
                         </div>
                     </div>
@@ -289,7 +323,6 @@ export default class App extends React.Component {
                         <div id='map'></div>
                     </div>
                 </div>
-
             </Paper>
         )
     }

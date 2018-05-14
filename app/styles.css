@@ -10,7 +10,7 @@ html {
 }
 
 .title {
-    padding: 10px;
+    padding: 5px;
 }
 
 .top-container {
@@ -27,7 +27,7 @@ html {
 .radio-container {
     display: flex;
     flex-direction: row;
-    padding: 20px;
+    padding: 10px;
 }
 
 .radio {
@@ -74,8 +74,19 @@ html {
 .csv-class {
     display: flex;
     flex-direction: column;
-    border: #555;
+    border-style: solid;
+    border-width: 1px;
     border-color: #555;
+    padding: 10px;
+}
+
+.csv-link {
+    padding: 5px;
+}
+
+#map {
+    border-style: solid;
+    border-width: 2px;
 }
 
 @media only screen and (max-width: 1000px) {
