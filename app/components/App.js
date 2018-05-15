@@ -10,7 +10,7 @@ import DropDown from './DropDown';
 import css from '../styles.css';
 import { debug } from 'util';
 import geostats from '../../public/lib/geostats.js';
-import csv_data from './csvData.js';
+import csvData from './csvData.js';
 
 //data
 const geoJsonFeature = require('./geoJsonData.json')
@@ -46,7 +46,8 @@ const prettyLink  = {
     color: '#000'
   };
 
-export default class App extends React.Component {
+  
+  export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -62,35 +63,10 @@ export default class App extends React.Component {
         var county_inbound;
         var county_outbound;
         var geojson;
+        var arr = [];
         var newSelected = this.state.selectedOption;
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
-
-        // var a2 = Array(12, 22, 5, 8, 43, 2, 34, 12, 34, 36, 5, 21, 23, 45);
-        // var serie2 = new geostats(a2);
-        // document.write('<p>geostats.max() : ' + serie2.max() + '<\/p>');
-
-        function nl2br(str, is_xhtml) {
-            var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br />' : '<br>';
-            return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
-        }
-        
-        var a5 = Array(0.1, 1.2, 3, 2.5, 1.6, 2.2, 3.1, 2.8, 1.1, 2.7, 7.1);
-
-        var serie = new geostats();
-        serie.setSerie(a5);
-        
-        var a = serie.getClassJenks(5);
-        str += '<strong>Classification Method : <\/strong>' + serie.method + " :\n";
-        str += '<div class="classes">';
-        var ranges = serie.ranges;
-        for (i = 0; i < ranges.length; i++) {
-            str += ranges[i] + "\n";
-        }
-        str += '<\/div>';
-
-        document.write('<p>' + nl2br(serie.info()) + '<\/p>');
-        document.write('<p>' + nl2br(str) + '<\/p>');
          
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
@@ -148,16 +124,48 @@ export default class App extends React.Component {
             };
         }
 
+        function setJenks(arr) {
+            // ------------ mierda de jenks ------------
+            function nl2br(str, is_xhtml) {
+                var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br />' : '<br>';
+                return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
+            }
+            
+    
+            var serie = new geostats();
+            // debugger;
+            serie.setSerie(arr);
+
+            var intervalAmount = arr.length >= 5 ? 5 : arr.length;
+        
+
+            var a = serie.getClassJenks(intervalAmount);
+            var str = '<strong>Classification Method : <\/strong>' + serie.method + " :\n";
+            str += '<div class="classes">';
+            var ranges = serie.ranges;
+            for (var i = 0; i < ranges.length; i++) {
+                str += ranges[i] + "\n";
+            }
+            str += '<\/div>';
+    
+            document.write('<p>' + nl2br(serie.info()) + '<\/p>');
+            document.write('<p>' + nl2br(str) + '<\/p>');
+    
+            // //  ------------------------------------
+        }
+
         function clickedFeature(e) {
             var layer = e.target;
             info.update(layer.feature.properties);
+            
             if (outbound.checked) {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_outbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_outbound[i][0]) {
                             // console.log(county_outbound);
                             console.log(county_outbound[i][1]);
-
+                            arr.push(Number(county_outbound[i][1]));
+                            // console.log(arr);
                             map._layers[key].setStyle({
                                 fillColor: '#FD8D3C',
                                 weight: 1,
@@ -175,7 +183,10 @@ export default class App extends React.Component {
                         dashArray: '',
                         fillOpacity: 0.7
                     });
+
                 }
+                console.log(arr)
+                setJenks(arr);
             }
             else if (inbound.checked) {
                 for (var key in map._layers) {
@@ -183,6 +194,8 @@ export default class App extends React.Component {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_inbound[i][0]) {
                             console.log(county_inbound);
                             // console.log(county_inbound[i][1]);
+                            arr.push(Number(county_inbound[i][1]));
+                            console.log(arr);
                             map._layers[key].setStyle({
                                 fillColor: '#FC4E2A',
                                 weight: 1,
@@ -201,6 +214,8 @@ export default class App extends React.Component {
                         fillOpacity: 0.7
                     });
                 }
+                console.log(arr);
+                setJenks(arr);
             }
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
@@ -240,9 +255,7 @@ export default class App extends React.Component {
         }
 
         var legend = L.control({ position: 'bottomright' });
-
         legend.onAdd = function (map) {
-            
 
             var div = L.DomUtil.create('div', 'info legend'),
                 grades = [0, 10, 100, 250, 500, 1000, 2500, 5000, 7500, 10000, 35000],
@@ -257,11 +270,9 @@ export default class App extends React.Component {
                     '<i style="background:' + getColor(from + 1) + '"></i> ' +
                     from + (to ? '&ndash;' + to : '+'));
             }
-
             div.innerHTML = labels.join('<br>');
             return div;
         };
-
         legend.addTo(map);
     }
 
@@ -272,6 +283,7 @@ export default class App extends React.Component {
     handleOptionChange(changeEvent) {
         this.setState({ selectedOption: changeEvent.target.value });
     }
+    
 
     render() {
         return (
@@ -312,7 +324,7 @@ export default class App extends React.Component {
                         </div>
                         <div className={"csv-class"}>
                             <div className={'csv-link'}>
-                                <CSVLink data={dataTest} style={prettyLink} filename={"map-data.csv"}>Download Map CSV ⬇ </CSVLink>
+                                <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Download Map CSV ⬇ </CSVLink>
                             </div>
                             <div className={'csv-link'}>
                                 <CSVLink data={dataTest} style={prettyLink} filename={"county-data.csv"}>Download Selected County CSV ⬇</CSVLink>
