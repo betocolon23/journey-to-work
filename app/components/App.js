@@ -54,11 +54,15 @@ export default class App extends React.Component {
         var map = L.map('map').setView([18.2208, -66.3500], 9);
         var county_inbound;
         var county_outbound;
+        var county_net;
+        var net_inbound;
+        var net_outbound;
         var geojson;
         var arr = [];
         var newSelected = this.state.selectedOption;
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
+        var net = document.getElementById('net');
         var intervalBreak;
         var firstBreak;
         var secondBreak;
@@ -87,6 +91,7 @@ export default class App extends React.Component {
                             '#ffbf80';
         }
 
+
         info.update = function (props) {
             if (props) {
                 if (outbound.checked) {
@@ -96,38 +101,57 @@ export default class App extends React.Component {
                         }
                     });
                     county_outbound = county_outbound.filter(Boolean);
+                    console.log(county_outbound);
                     this._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
-
+                    
                     function csvCountyData() {
                         var selected_county_csv = county_outbound
-                        console.log(selected_county_csv);
-                        return [
-                            selected_county_csv
-                        ]
-                        console.log(selected_county_csv);
+                        // console.log(selected_county_csv);
+                        return selected_county_csv
                     }
                     csvCountyData();
+                    
                 }
-                else {
+                else if (inbound.checked) {
                     county_inbound = county_data.features.map(function (feature) {
                         if (feature.properties['County Code Place of Work'] === props.geo_id) {
                             return [feature.properties['County Name'].trim(), feature.properties['Workers in Commuting Flow']];
                         }
                     });
                     county_inbound = county_inbound.filter(Boolean);
+                    console.log(county_inbound)
                     this._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
                     function csvCountyData() {
                         var selected_county_csv = county_inbound
-                        console.log(selected_county_csv);
-                        return [
-                            selected_county_csv
-                        ]
-                        console.log(selected_county_csv);
+                        // console.log(selected_county_csv);
+                        return selected_county_csv
+                    }
+                    csvCountyData();
+                }
+                else {
+                    county_net  = county_data.features.map(function (feature) {
+                        net_outbound = feature.properties['County Code Residence'] === props.geo_id;
+                        net_inbound = feature.properties['County Code Place of Work'] === props.geo_id;
+                        if (net_inbound && net_outbound) {
+                            return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow'], feature.properties['County Name'].trim(), feature.properties['Workers in Commuting Flow']];
+                        }
+                    });
+                    county_net  = county_net.filter(Boolean);
+                    console.log(county_net);
+
+                    this._div.innerHTML = (props ?
+                        '<h4>' + props.Municipio + '</h4>'
+                        : 'Click over a county');
+                    
+                    function csvCountyData() {
+                        var selected_county_csv = county_net 
+                        // console.log(selected_county_csv);
+                        return selected_county_csv
                     }
                     csvCountyData();
                 }
@@ -163,18 +187,12 @@ export default class App extends React.Component {
             }
             str += '<\/div>';
 
-            // document.write('<p>' + nl2br(serie.info()) + '<\/p>');
-            // document.write('<p>' + nl2br(str) + '<\/p>');
-            // console.log(intervalBreak);
             firstBreak = intervalBreak[0];
             secondBreak = intervalBreak[1];
             thirdBreak = intervalBreak[2];
             fourthBreak = intervalBreak[3];
             fifthBreak = intervalBreak[4];
 
-            console.log(ranges);
-            console.log(intervalBreak);
-            // console.log(nl2br(str));
 
             function getColor(d) {
                 return d > fifthBreak ? '#994d00' :
@@ -183,18 +201,18 @@ export default class App extends React.Component {
                             d > secondBreak ? '#ff9933' :
                                 '#ffbf80';
             }
-    
+
             var legend = L.control({ position: 'bottomright' });
             legend.onAdd = function (map) {
                 var div = L.DomUtil.create('div', 'info legend'),
                     grades = [firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak],
                     labels = [],
                     from, to;
-    
+
                 for (var i = 0; i < grades.length; i++) {
                     from = grades[i];
                     to = grades[i + 1];
-    
+
                     labels.push(
                         '<i style="background:' + getColor(from + 1) + '"></i> ' +
                         from + (to ? '&ndash;' + to : '+'));
@@ -204,7 +222,7 @@ export default class App extends React.Component {
             };
             legend.addTo(map);
         }
-        
+
 
         function clickedFeature(e) {
             var layer = e.target;
@@ -233,6 +251,7 @@ export default class App extends React.Component {
                     });
 
                 }
+                console.log(arr);
                 setJenks(arr);
             }
             else if (inbound.checked) {
@@ -247,6 +266,33 @@ export default class App extends React.Component {
                                 dashArray: '',
                                 fillOpacity: 0.7,
                                 fillColor: getColor(county_inbound[i][1])
+                            });
+                        }
+                    }
+                    layer.setStyle({
+                        weight: 3,
+                        color: '#666',
+                        dashArray: '',
+                        fillOpacity: 0.7
+                    });
+                }
+                console.log(arr);
+                setJenks(arr);
+            }
+
+            //Arreglar para Net values 
+            else if (net.checked) {
+                for (var key in map._layers) {
+                    for (var i = 0; i < county_net.length; i++) {
+                        if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_net[i][0]) {
+                            arr.push(Number(county_net[i][1]));
+                            map._layers[key].setStyle({
+                                fillColor: '#FC4E2A',
+                                weight: 1,
+                                color: '#666',
+                                dashArray: '',
+                                fillOpacity: 0.7,
+                                fillColor: getColor(county_net[i][1])
                             });
                         }
                     }
@@ -328,13 +374,24 @@ export default class App extends React.Component {
                                     Inbound
                                 </label>
                             </div>
+                            <div className="radio">
+                                <label>
+                                    <input
+                                        type="radio" value="net"
+                                        checked={this.state.selectedOption === 'net'}
+                                        onChange={this.handleOptionChange}
+                                        id='net'
+                                    />
+                                    Net
+                                </label>
+                            </div>
                         </div>
                         <div className={"csv-class"}>
                             <div className={'csv-link'}>
                                 <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Download Map CSV ⬇ </CSVLink>
                             </div>
                             <div className={'csv-link'}>
-                                <CSVLink data={csvData()} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Download Selected County CSV ⬇</CSVLink>
+                                {/* <CSVLink data={this.selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Download Selected County CSV ⬇</CSVLink> */}
                             </div>
                         </div>
                     </div>
