@@ -58,7 +58,10 @@ export default class App extends React.Component {
         var net_inbound;
         var net_outbound;
         var geojson;
-        var arr = [];
+        var bound_array = [];
+        var net_inbound_array = [];
+        var net_outbound_array = [];
+        var net_array = [];
         var newSelected = this.state.selectedOption;
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
@@ -91,35 +94,44 @@ export default class App extends React.Component {
                             '#ffbf80';
         }
 
+        function countyOutbound(county_data, props) {
+            county_outbound = county_data.features.map(function (feature) {
+                if (feature.properties['County Code Residence'] === props.geo_id) {
+                    return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow']];
+                }
+            });
+            return county_outbound;
+        }
+
+        function countyInbound(county_data, props) {
+            county_inbound = county_data.features.map(function (feature) {
+                if (feature.properties['County Code Place of Work'] === props.geo_id) {
+                    return [feature.properties['County Name'].trim(), feature.properties['Workers in Commuting Flow']];
+                }
+            });
+            return county_inbound;
+        }
 
         info.update = function (props) {
             if (props) {
                 if (outbound.checked) {
-                    county_outbound = county_data.features.map(function (feature) {
-                        if (feature.properties['County Code Residence'] === props.geo_id) {
-                            return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow']];
-                        }
-                    });
+                    county_outbound = countyOutbound(county_data, props)
                     county_outbound = county_outbound.filter(Boolean);
                     console.log(county_outbound);
                     this._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
-                    
+
                     function csvCountyData() {
                         var selected_county_csv = county_outbound
                         // console.log(selected_county_csv);
                         return selected_county_csv
                     }
                     csvCountyData();
-                    
+
                 }
                 else if (inbound.checked) {
-                    county_inbound = county_data.features.map(function (feature) {
-                        if (feature.properties['County Code Place of Work'] === props.geo_id) {
-                            return [feature.properties['County Name'].trim(), feature.properties['Workers in Commuting Flow']];
-                        }
-                    });
+                    county_inbound = countyInbound(county_data, props);
                     county_inbound = county_inbound.filter(Boolean);
                     console.log(county_inbound)
                     this._div.innerHTML = (props ?
@@ -134,22 +146,31 @@ export default class App extends React.Component {
                     csvCountyData();
                 }
                 else {
-                    county_net  = county_data.features.map(function (feature) {
-                        net_outbound = feature.properties['County Code Residence'] === props.geo_id;
-                        net_inbound = feature.properties['County Code Place of Work'] === props.geo_id;
-                        if (net_inbound && net_outbound) {
-                            return [feature.properties['County Name_1'].trim(), feature.properties['Workers in Commuting Flow'], feature.properties['County Name'].trim(), feature.properties['Workers in Commuting Flow']];
+                    county_outbound = countyOutbound(county_data, props)
+                    county_outbound = county_outbound.filter(Boolean);
+                    county_inbound = countyInbound(county_data, props);
+                    county_inbound = county_inbound.filter(Boolean);
+                    for (var i = 0; i < county_inbound.length; i++) {
+                        for (var j = 0; j < county_outbound.length; j++) {
+                            if (county_inbound[i][0] == county_outbound[j][0]) {
+                                net_inbound_array.push(Number(county_inbound[i][1]));
+                                net_outbound_array.push(Number(county_outbound[j][1]));
+                                net_array = net_inbound_array.map(function (num, idx) {
+                                    return num - net_outbound_array[idx]; 
+                                });
+                            }        
                         }
-                    });
-                    county_net  = county_net.filter(Boolean);
-                    console.log(county_net);
+                    }
+                    console.log(net_inbound_array);
+                    console.log(net_outbound_array);
+                    console.log(net_array);
 
                     this._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
-                    
+
                     function csvCountyData() {
-                        var selected_county_csv = county_net 
+                        var selected_county_csv = county_net
                         // console.log(selected_county_csv);
                         return selected_county_csv
                     }
@@ -169,15 +190,15 @@ export default class App extends React.Component {
             };
         }
 
-        function setJenks(arr) {
+        function setJenks(bound_array) {
             function nl2br(str, is_xhtml) {
                 var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br />' : '<br>';
                 return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
             }
 
             var serie = new geostats();
-            serie.setSerie(arr);
-            var intervalAmount = arr.length >= 5 ? 5 : arr.length;
+            serie.setSerie(bound_array);
+            var intervalAmount = bound_array.length >= 5 ? 5 : bound_array.length;
             intervalBreak = serie.getClassJenks(intervalAmount);
             var str = '<strong>Classification Method : <\/strong>' + serie.method + " :\n";
             str += '<div class="classes">';
@@ -232,7 +253,7 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_outbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_outbound[i][0]) {
-                            arr.push(Number(county_outbound[i][1]));
+                            bound_array.push(Number(county_outbound[i][1]));
                             map._layers[key].setStyle({
                                 fillColor: '#FD8D3C',
                                 weight: 1,
@@ -251,14 +272,14 @@ export default class App extends React.Component {
                     });
 
                 }
-                console.log(arr);
-                setJenks(arr);
+                console.log(bound_array);
+                setJenks(bound_array);
             }
             else if (inbound.checked) {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_inbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_inbound[i][0]) {
-                            arr.push(Number(county_inbound[i][1]));
+                            bound_array.push(Number(county_inbound[i][1]));
                             map._layers[key].setStyle({
                                 fillColor: '#FC4E2A',
                                 weight: 1,
@@ -276,8 +297,8 @@ export default class App extends React.Component {
                         fillOpacity: 0.7
                     });
                 }
-                console.log(arr);
-                setJenks(arr);
+                console.log(bound_array);
+                setJenks(bound_array);
             }
 
             //Arreglar para Net values 
@@ -285,7 +306,7 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_net.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_net[i][0]) {
-                            arr.push(Number(county_net[i][1]));
+                            bound_array.push(Number(county_net[i][1]));
                             map._layers[key].setStyle({
                                 fillColor: '#FC4E2A',
                                 weight: 1,
@@ -303,7 +324,7 @@ export default class App extends React.Component {
                         fillOpacity: 0.7
                     });
                 }
-                setJenks(arr);
+                setJenks(bound_array);
             }
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
