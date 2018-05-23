@@ -54,14 +54,10 @@ export default class App extends React.Component {
         var map = L.map('map').setView([18.2208, -66.3500], 9);
         var county_inbound;
         var county_outbound;
-        var county_net;
-        var net_inbound;
-        var net_outbound;
         var geojson;
         var bound_array = [];
-        var net_inbound_array = [];
-        var net_outbound_array = [];
         var net_array = [];
+        var net_data = [];
         var newSelected = this.state.selectedOption;
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
@@ -151,27 +147,41 @@ export default class App extends React.Component {
                     county_inbound = countyInbound(county_data, props);
                     county_inbound = county_inbound.filter(Boolean);
                     for (var i = 0; i < county_inbound.length; i++) {
-                        for (var j = 0; j < county_outbound.length; j++) {
+                        for (var j = 0; j < county_outbound.length; j++) {                            
                             if (county_inbound[i][0] == county_outbound[j][0]) {
-                                net_inbound_array.push(Number(county_inbound[i][1]));
-                                net_outbound_array.push(Number(county_outbound[j][1]));
-                                net_array = net_inbound_array.map(function (num, idx) {
-                                    return num - net_outbound_array[idx]; 
-                                });
+                                //Nombres de Municipios 
+                                var net_data = [];
+                                var net_total;
+
+                                //Add Municipios to array of net_data
+                                net_data.push(county_inbound[i][0]);
+                                net_data.push(Number(county_inbound[i][1]));
+
+                                //Add Commuting Flow to array of net_data
+                                net_data.push(county_outbound[j][0]);
+                                net_data.push(Number(county_outbound[j][1]));
+                                
+                                //Loop para restar inbound - outbound
+                                for (var k = 0; k < net_data.length; k++) {
+                                    net_total = net_data[1] - net_data[3]
+                                }
+                                net_data.push(net_total);
+                                // console.log(net_data);
+
+                                //Remover los valores repetidos 
+                                net_array = Array.from(new Set(net_data));
+                                console.log(net_array);
+
                             }        
                         }
                     }
-                    console.log(net_inbound_array);
-                    console.log(net_outbound_array);
-                    console.log(net_array);
 
                     this._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
                     function csvCountyData() {
-                        var selected_county_csv = county_net
-                        // console.log(selected_county_csv);
+                        var selected_county_csv = net_array
                         return selected_county_csv
                     }
                     csvCountyData();
@@ -304,16 +314,16 @@ export default class App extends React.Component {
             //Arreglar para Net values 
             else if (net.checked) {
                 for (var key in map._layers) {
-                    for (var i = 0; i < county_net.length; i++) {
-                        if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_net[i][0]) {
-                            bound_array.push(Number(county_net[i][1]));
+                    for (var i = 0; i < net_array.length; i++) {
+                        if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === net_array[i][0]) {
+                            // net_array.push(Number(net_array[i][1]));
                             map._layers[key].setStyle({
                                 fillColor: '#FC4E2A',
                                 weight: 1,
                                 color: '#666',
                                 dashArray: '',
                                 fillOpacity: 0.7,
-                                fillColor: getColor(county_net[i][1])
+                                fillColor: getColor(net_array[i][1])
                             });
                         }
                     }
@@ -324,7 +334,7 @@ export default class App extends React.Component {
                         fillOpacity: 0.7
                     });
                 }
-                setJenks(bound_array);
+                setJenks(net_array);
             }
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
