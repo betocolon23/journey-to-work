@@ -37,7 +37,7 @@ const prettyLink = {
 };
 
 const county_csv_headers = ['County Name', 'Workers in Commuting Flow'];
-
+var selected_county_csv = [[]];
 
 export default class App extends React.Component {
     constructor(props) {
@@ -73,7 +73,11 @@ export default class App extends React.Component {
         var thirdBreak;
         var fourthBreak;
         var fifthBreak;
-        var selected_county_csv;
+        var legend;
+
+        function csvCountyData(data) {
+            selected_county_csv = data
+        }
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -123,12 +127,7 @@ export default class App extends React.Component {
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
-                    function csvCountyData() {
-                        var selected_county_csv = county_outbound
-                        // console.log(selected_county_csv);
-                        return selected_county_csv
-                    }
-                    csvCountyData();
+                    csvCountyData(county_outbound);
 
                 }
                 else if (inbound.checked) {
@@ -139,12 +138,7 @@ export default class App extends React.Component {
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
-                    function csvCountyData() {
-                        var selected_county_csv = county_inbound
-                        // console.log(selected_county_csv);
-                        return selected_county_csv
-                    }
-                    csvCountyData();
+                    csvCountyData(county_inbound);
                 }
                 else {
                     county_outbound = countyOutbound(county_data, props)
@@ -206,8 +200,10 @@ export default class App extends React.Component {
                                 net_data.splice(1, 1);
 
                                 //Net Array Global
-                                net_array.push(net_data);    
-                            }        
+                                net_array.push(net_data);
+                                break;
+                            }
+                            //Find function comprar arreglos si esta undefinded no esta los que estan se añaden al array    
                         }
                     }
                     municipio_name = props.Municipio;
@@ -218,11 +214,7 @@ export default class App extends React.Component {
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
-                    function csvCountyData() {
-                        var selected_county_csv = net_array
-                        return selected_county_csv
-                    }
-                    csvCountyData();
+                    csvCountyData(net_array);
                 }
             }
         };
@@ -230,7 +222,7 @@ export default class App extends React.Component {
 
         function featureStyle(feature) {
             return {
-                fillColor: '#FFEDA0',
+                fillColor: '#F1EDDF',
                 color: 'grey',
                 opacity: 1,
                 dashArray: '3',
@@ -271,7 +263,7 @@ export default class App extends React.Component {
                                 '#ffbf80';
             }
 
-            var legend = L.control({ position: 'bottomright' });
+            legend = L.control({ position: 'bottomright' });
             legend.onAdd = function (map) {
                 var div = L.DomUtil.create('div', 'info legend'),
                     grades = [firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak],
@@ -292,10 +284,18 @@ export default class App extends React.Component {
             legend.addTo(map);
         }
 
-
+        function resetData() {
+            geojson.setStyle(featureStyle);
+            [bound_array, net_array, absolute_net, net_data, inbound_calculation, inbound_sumatory] = [[], [], [], [], [], 0];
+            if (legend) {
+                legend.remove();
+            }
+        }
+        
         function clickedFeature(e) {
             // resetFeature(e);
-            // debugger;
+            resetData();
+
             var layer = e.target;
             info.update(layer.feature.properties);
 
@@ -392,7 +392,7 @@ export default class App extends React.Component {
         }
 
         function resetFeature(e) {
-            debugger;
+    
             // target.resetStyle(e.target);
         }
 
@@ -473,7 +473,7 @@ export default class App extends React.Component {
                                 <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Download Map CSV ⬇ </CSVLink>
                             </div>
                             <div className={'csv-link'}>
-                                {/* <CSVLink data={this.selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Download Selected County CSV ⬇</CSVLink> */}
+                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Download Selected County CSV ⬇</CSVLink>
                             </div>
                         </div>
                     </div>
