@@ -52,12 +52,17 @@ export default class App extends React.Component {
 
     componentDidMount() {
         var map = L.map('map').setView([18.2208, -66.3500], 9);
+        var oldMap = map;
         var county_inbound;
         var county_outbound;
         var geojson;
         var bound_array = [];
         var net_array = [];
+        var absolute_net = [];
         var net_data = [];
+        var inbound_calculation = [];
+        var inbound_sumatory = 0;
+        var municipio_name;
         var newSelected = this.state.selectedOption;
         var inbound = document.getElementById('inbound');
         var outbound = document.getElementById('outbound');
@@ -149,15 +154,30 @@ export default class App extends React.Component {
                     for (var i = 0; i < county_inbound.length; i++) {
                         for (var j = 0; j < county_outbound.length; j++) {                            
                             if (county_inbound[i][0] == county_outbound[j][0]) {
-                                //Nombres de Municipios 
+                                //Array de county_inbound y county_outbound juntos 
                                 var net_data = [];
+
+                                //Variable para hacer el calculo de la resta de inbound y outbound
                                 var net_total;
 
-                                //Add Municipios to array of net_data
+                                //Add county_inbound Municipio and commuting flow to Array net_data
                                 net_data.push(county_inbound[i][0]);
                                 net_data.push(Number(county_inbound[i][1]));
 
-                                //Add Commuting Flow to array of net_data
+                                // Calculate Inbound Sumatory
+                                var get_inbound_selected;
+                                get_inbound_selected = (Number(county_inbound[i][1]));
+
+                                //inbound array para caluclar sumatoria 
+                                inbound_calculation.push(get_inbound_selected);
+
+                                //Inbound Sumatory para pasarla al mapa 
+                                inbound_sumatory = inbound_calculation.reduce(add, 0);
+                                function add(a, b) {
+                                    return a + b
+                                }
+                                
+                                //Add county_outbound Municipio and coummuting flow to Array net_data
                                 net_data.push(county_outbound[j][0]);
                                 net_data.push(Number(county_outbound[j][1]));
                                 
@@ -165,16 +185,34 @@ export default class App extends React.Component {
                                 for (var k = 0; k < net_data.length; k++) {
                                     net_total = net_data[1] - net_data[3]
                                 }
+
+                                //Add net_total to each array 
                                 net_data.push(net_total);
+
+                                //Remover los valores repetidos en net_data y pasarlos a net array
+                                net_data = Array.from(new Set(net_data));
                                 // console.log(net_data);
 
-                                //Remover los valores repetidos 
-                                net_array = Array.from(new Set(net_data));
-                                console.log(net_array);
+                                //Check Shortest Array 
+                                var clicked_element;
+                                for (var z = 0; z < net_data.length; z++) {
+                                    if (net_data.length == 3) {
+                                        clicked_element = net_data[1]
+                                        net_data.push(clicked_element);
+                                    }
+                                }
+                                
+                                net_data.splice(1, 1);
+                                net_data.splice(1, 1);
 
+                                //Net Array Global
+                                net_array.push(net_data);    
                             }        
                         }
                     }
+                    municipio_name = props.Municipio;
+                    
+                    // console.log(inbound_sumatory);
 
                     this._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
@@ -210,7 +248,7 @@ export default class App extends React.Component {
             serie.setSerie(bound_array);
             var intervalAmount = bound_array.length >= 5 ? 5 : bound_array.length;
             intervalBreak = serie.getClassJenks(intervalAmount);
-            var str = '<strong>Classification Method : <\/strong>' + serie.method + " :\n";
+            var str = '<strong>Classification Method : <\/strong>' + serie.method +  " :\n";
             str += '<div class="classes">';
             var ranges = serie.ranges;
             for (var i = 0; i < ranges.length; i++) {
@@ -256,6 +294,8 @@ export default class App extends React.Component {
 
 
         function clickedFeature(e) {
+            // resetFeature(e);
+            // debugger;
             var layer = e.target;
             info.update(layer.feature.properties);
 
@@ -316,7 +356,16 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < net_array.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === net_array[i][0]) {
-                            // net_array.push(Number(net_array[i][1]));
+                            //Codigo para calcular el municipio clicked 
+                            if (municipio_name === net_array[i][0]) {
+                                var county_net_clicked;
+                                county_net_clicked = inbound_sumatory - net_array[i][1]
+
+                                //Remover el valor del click seleccionado por el county_net_clicked 
+                                // net_array.splice([i][1], 1, county_net_clicked);
+                                console.log(county_net_clicked);
+                            }
+                            absolute_net.push(Number(net_array[i][1]));
                             map._layers[key].setStyle({
                                 fillColor: '#FC4E2A',
                                 weight: 1,
@@ -334,7 +383,8 @@ export default class App extends React.Component {
                         fillOpacity: 0.7
                     });
                 }
-                setJenks(net_array);
+                console.log(net_array);
+                setJenks(absolute_net);
             }
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
@@ -342,7 +392,8 @@ export default class App extends React.Component {
         }
 
         function resetFeature(e) {
-            geojson.resetStyle(e.target);
+            debugger;
+            // target.resetStyle(e.target);
         }
 
         function onEachFeature(feature, layer) {
