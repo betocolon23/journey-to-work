@@ -350,8 +350,7 @@ export default class App extends React.Component {
                 console.log(bound_array);
                 setJenks(bound_array);
             }
-
-            //Arreglar para Net values 
+ 
             else if (net.checked) {
                 for (var key in map._layers) {
                     for (var i = 0; i < net_array.length; i++) {
@@ -391,15 +390,9 @@ export default class App extends React.Component {
             }
         }
 
-        function resetFeature(e) {
-    
-            // target.resetStyle(e.target);
-        }
-
         function onEachFeature(feature, layer) {
             layer.on({
                 click: clickedFeature,
-                // click: resetFeature
             });
         }
 
