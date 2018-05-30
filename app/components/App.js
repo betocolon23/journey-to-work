@@ -91,12 +91,28 @@ export default class App extends React.Component {
             return this._div;
         }
 
-        function getColor(d) {
+        function getOutboundColor(d) {
             return d > 1000 ? '#994d00' :
                 d > 500 ? '#cc6600' :
                     d > 100 ? '#ff8000' :
                         d > 10 ? '#ff9933' :
                             '#ffbf80';
+        }
+
+        function getInboundColor(d) {
+            return d > 1000 ? '#004d00' :
+                d > 500 ? '#008000' :
+                    d > 100 ? '#00cc00' :
+                        d > 10 ? '#00ff00' :
+                            '#80ff80';
+        }
+
+        function getNetColor(d) {
+            return d > 1000 ? '#0066cc' :
+                d > 500 ? '#009900' :
+                    d > 100 ? '#ffff00' :
+                        d > 10 ? '#ffcc00' :
+                            '#ff0000';
         }
 
         function countyOutbound(county_data, props) {
@@ -255,7 +271,7 @@ export default class App extends React.Component {
             fifthBreak = intervalBreak[4];
 
 
-            function getColor(d) {
+            function getOutboundColor(d) {
                 return d > fifthBreak ? '#994d00' :
                     d > fourthBreak ? '#cc6600' :
                         d > thirdBreak ? '#ff8000' :
@@ -263,20 +279,48 @@ export default class App extends React.Component {
                                 '#ffbf80';
             }
 
+            function getInboundColor(d) {
+                return d > fifthBreak ? '#004d00' :
+                    d > fourthBreak ? '#008000' :
+                        d > thirdBreak ? '#00cc00' :
+                            d > secondBreak ? '#00ff00' :
+                                '#80ff80';
+            }
+
+            function getNetColor(d) {
+                return d > fifthBreak ? '#0066cc' :
+                    d > fourthBreak ? '#009900' :
+                        d > thirdBreak ? '#ffff00' :
+                            d > secondBreak ? '#ffcc00' :
+                                '#ff0000';
+            }
+
             legend = L.control({ position: 'bottomright' });
+              
             legend.onAdd = function (map) {
                 var div = L.DomUtil.create('div', 'info legend'),
                     grades = [firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak],
-                    labels = [],
+                    labels = ['<strong>Commuting by County</strong>'],
                     from, to;
 
                 for (var i = 0; i < grades.length; i++) {
                     from = grades[i];
                     to = grades[i + 1];
-
-                    labels.push(
-                        '<i style="background:' + getColor(from + 1) + '"></i> ' +
-                        from + (to ? '&ndash;' + to : '+'));
+                    if (outbound.checked) {
+                        labels.push(
+                            '<i style="background:' + getOutboundColor(from + 1) + '"></i> ' +
+                            from + (to ? '&ndash;' + to : '+'));
+                    }
+                    else if (inbound.checked) {
+                        labels.push(
+                            '<i style="background:' + getInboundColor(from + 1) + '"></i> ' +
+                            from + (to ? '&ndash;' + to : '+'));
+                    }
+                    else if (net.checked) {
+                        labels.push(
+                            '<i style="background:' + getNetColor(from + 1) + '"></i> ' +
+                            from + (to ? '&ndash;' + to : '+'));
+                    }
                 }
                 div.innerHTML = labels.join('<br>');
                 return div;
@@ -310,7 +354,7 @@ export default class App extends React.Component {
                                 color: '#666',
                                 dashArray: '',
                                 fillOpacity: 0.7,
-                                fillColor: getColor(county_outbound[i][1])
+                                fillColor: getOutboundColor(county_outbound[i][1])
                             });
                         }
                     }
@@ -336,7 +380,7 @@ export default class App extends React.Component {
                                 color: '#666',
                                 dashArray: '',
                                 fillOpacity: 0.7,
-                                fillColor: getColor(county_inbound[i][1])
+                                fillColor: getInboundColor(county_inbound[i][1])
                             });
                         }
                     }
@@ -371,7 +415,7 @@ export default class App extends React.Component {
                                 color: '#666',
                                 dashArray: '',
                                 fillOpacity: 0.7,
-                                fillColor: getColor(net_array[i][1])
+                                fillColor: getNetColor(net_array[i][1])
                             });
                         }
                     }
@@ -419,13 +463,13 @@ export default class App extends React.Component {
                 <div className={'full-container'}>
                     <div className={'title'}>Puerto Rico Journey to Work Map </div>
                     <div className={"top-container"}>
-                        {/* <DropDown
+                        <DropDown
                             className={"drop-down"}
                             onChange={this.handleChangeMunicipio}
                             selected={this.state.selected}
                             geoJsonFeature={geoJsonFeature}
                             county={county_data}
-                        /> */}
+                        />
                         <div className="radio-container">
                             <div className="radio">
                                 <label>
@@ -463,10 +507,10 @@ export default class App extends React.Component {
                         </div>
                         <div className={"csv-class"}>
                             <div className={'csv-link'}>
-                                <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Download Map CSV ⬇ </CSVLink>
+                                <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Export to Excel ⬇ </CSVLink>
                             </div>
                             <div className={'csv-link'}>
-                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Download Selected County CSV ⬇</CSVLink>
+                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Export Selected to Excel ⬇</CSVLink>
                             </div>
                         </div>
                     </div>
