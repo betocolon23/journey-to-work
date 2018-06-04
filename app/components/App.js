@@ -41,9 +41,9 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             "selected": [],
-            "data": {
-                fields: []
-            },
+            // "data": {
+            //     fields: []
+            // },
             selectedOption: 'outbound',
             selected_county_csv: [[]]
             
@@ -485,7 +485,7 @@ export default class App extends React.Component {
                             className={"drop-down"}
                             onChange={this.handleChangeMunicipio}
                             selected={this.state.selected}
-                            fields={this.state.data.fields}
+                            // fields={this.state.data.fields}
                         />
                         <div className="radio-container">
                             <div className="radio">
