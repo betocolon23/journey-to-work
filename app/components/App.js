@@ -41,8 +41,8 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             "selected": [],
-            "list": {
-                municipio: []
+            "data": {
+                fields: []
             },
             selectedOption: 'outbound',
             selected_county_csv: [[]]
@@ -81,11 +81,16 @@ export default class App extends React.Component {
         //Como en los proyectos pasado pero a diferencia es que aqui la data ya esta local
         //En los pasados era con fetch (data.restult)
         //HELP
-        // this.setState({
-            // list: geoJsonFeature.features.properties.Municipio, 
-            // selected: [geoJsonFeature.feature.properties.Municipio["Adjuntas"]]
         // })
-        
+        // fetch('./geoJsonData.json')
+        //     .then(result => {
+        //         return result.json();
+        //     }).then(data => {
+        //         this.setState({ 
+        //             data: data.result,
+        //             selected: [data.result.fields.Municipio] 
+        //         })
+        //     })
 
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
@@ -480,7 +485,7 @@ export default class App extends React.Component {
                             className={"drop-down"}
                             onChange={this.handleChangeMunicipio}
                             selected={this.state.selected}
-                            // municipio={this.state.data.municipio}
+                            fields={this.state.data.fields}
                         />
                         <div className="radio-container">
                             <div className="radio">
