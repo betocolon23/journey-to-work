@@ -50,13 +50,7 @@ export default class App extends React.Component {
         }
         this.handleChangeMunicipio = this.handleChangeMunicipio.bind(this);
         this.handleOptionChange = this.handleOptionChange.bind(this);
-        // this.csvCountyData = this.csvCountyData.bind(this);
     }
-
-    // csvCountyData(data) {
-    //     this.setState({selected_county_csv: data})
-    //     // this.state.selected_county_csv = data
-    // }
 
     componentDidMount() {
         var map = L.map('map').setView([18.2208, -66.3500], 9);
@@ -83,10 +77,6 @@ export default class App extends React.Component {
         var fifthBreak;
         var legend;
 
-        function csvCountyData(data) {
-            // this.setState({selected_county_csv: data})
-            selected_county_csv = data
-        }
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -226,24 +216,26 @@ export default class App extends React.Component {
 
                                 //Net Array Global
                                 net_array.push(net_data);
-                                break;
                             }
                             //Find function comprar arreglos si esta undefinded no esta los que estan se añaden al array    
                         }
                     }
                     municipio_name = props.Municipio;
-                    
-                    // console.log(inbound_sumatory);
-
                     this._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
-
+                    console.log(net_array)
                     csvCountyData(net_array);
                 }
             }
         };
         info.addTo(map);
+
+        //Esta funcion guarda el array del county seleccionado en la variable selected_county_csv
+        //para despues en el render bajarla como un csv. El problema es que el array empieza vacio no importa cuando haga click. 
+        function csvCountyData(data) {
+            selected_county_csv = data
+        }
 
         function featureStyle(feature) {
             return {
@@ -346,7 +338,6 @@ export default class App extends React.Component {
         }
         
         function clickedFeature(e) {
-            // resetFeature(e);
             resetData();
 
             var layer = e.target;
@@ -375,7 +366,7 @@ export default class App extends React.Component {
                     });
 
                 }
-                console.log(bound_array);
+                // console.log(bound_array);
                 setJenks(bound_array);
             }
             else if (inbound.checked) {
@@ -400,7 +391,7 @@ export default class App extends React.Component {
                         fillOpacity: 0.7
                     });
                 }
-                console.log(bound_array);
+                // console.log(bound_array);
                 setJenks(bound_array);
             }
  
@@ -415,7 +406,7 @@ export default class App extends React.Component {
 
                                 //Remover el valor del click seleccionado por el county_net_clicked 
                                 // net_array.splice([i][1], 1, county_net_clicked);
-                                console.log(county_net_clicked);
+                                // console.log(county_net_clicked);
                             }
                             absolute_net.push(Number(net_array[i][1]));
                             map._layers[key].setStyle({
@@ -435,7 +426,7 @@ export default class App extends React.Component {
                         fillOpacity: 0.7
                     });
                 }
-                console.log(net_array);
+                // console.log(net_array);
                 setJenks(absolute_net);
             }
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
@@ -448,6 +439,8 @@ export default class App extends React.Component {
                 click: clickedFeature,
             });
         }
+
+
 
         geojson = L.geoJson(geoJsonFeature, {
             style: featureStyle,
@@ -464,9 +457,6 @@ export default class App extends React.Component {
     handleOptionChange(changeEvent) {
         this.setState({ selectedOption: changeEvent.target.value });
     }
-
-    
-
 
     render() {
         return (
@@ -521,7 +511,7 @@ export default class App extends React.Component {
                                 <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Export to Excel ⬇ </CSVLink>
                             </div>
                             <div className={'csv-link'}>
-                                {/* <CSVLink data={this.state.selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Export Selected to Excel ⬇</CSVLink> */}
+                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Export Selected to Excel ⬇</CSVLink>
                             </div>
                         </div>
                     </div>
