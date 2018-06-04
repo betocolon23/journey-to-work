@@ -44,11 +44,19 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             "selected": [],
-            selectedOption: 'outbound'
+            selectedOption: 'outbound',
+            selected_county_csv: [[]]
+            
         }
         this.handleChangeMunicipio = this.handleChangeMunicipio.bind(this);
         this.handleOptionChange = this.handleOptionChange.bind(this);
+        // this.csvCountyData = this.csvCountyData.bind(this);
     }
+
+    // csvCountyData(data) {
+    //     this.setState({selected_county_csv: data})
+    //     // this.state.selected_county_csv = data
+    // }
 
     componentDidMount() {
         var map = L.map('map').setView([18.2208, -66.3500], 9);
@@ -76,6 +84,7 @@ export default class App extends React.Component {
         var legend;
 
         function csvCountyData(data) {
+            // this.setState({selected_county_csv: data})
             selected_county_csv = data
         }
 
@@ -456,6 +465,8 @@ export default class App extends React.Component {
         this.setState({ selectedOption: changeEvent.target.value });
     }
 
+    
+
 
     render() {
         return (
@@ -510,7 +521,7 @@ export default class App extends React.Component {
                                 <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Export to Excel ⬇ </CSVLink>
                             </div>
                             <div className={'csv-link'}>
-                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Export Selected to Excel ⬇</CSVLink>
+                                {/* <CSVLink data={this.state.selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Export Selected to Excel ⬇</CSVLink> */}
                             </div>
                         </div>
                     </div>
