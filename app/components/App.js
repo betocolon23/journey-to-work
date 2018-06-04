@@ -1,12 +1,9 @@
-//libraries
 import React from 'react';
 import Paper from 'material-ui/Paper';
 import { Map, TileLayer, Marker, Popup, geoJSON, GeoJSON, geoJson } from 'leaflet';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import { CSVLink, CSVDownload } from 'react-csv';
-//components
 import DropDown from './DropDown';
-//css
 import css from '../styles.css';
 import { debug } from 'util';
 import geostats from '../../public/lib/geostats.js';
@@ -44,6 +41,7 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             "selected": [],
+            "municipio": [],
             selectedOption: 'outbound',
             selected_county_csv: [[]]
             
@@ -76,6 +74,11 @@ export default class App extends React.Component {
         var fourthBreak;
         var fifthBreak;
         var legend;
+
+        this.setState({
+            municipio: county_data.features
+        })
+        // console.log(municipio);
 
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
@@ -233,6 +236,8 @@ export default class App extends React.Component {
 
         //Esta funcion guarda el array del county seleccionado en la variable selected_county_csv
         //para despues en el render bajarla como un csv. El problema es que el array empieza vacio no importa cuando haga click. 
+        //Esta funcion es llamanda en info.update = function(props) line 138
+        //Cada vez se hace un array nuevo. 
         function csvCountyData(data) {
             selected_county_csv = data
         }

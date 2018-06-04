@@ -12,15 +12,15 @@ export default class DropDown extends React.Component {
     };
     this.menuItems = this.menuItems.bind(this);
     // console.log(this.props.county);
-    // console.log(this.props.geoJsonFeature)
+    console.log(this.props.geoJsonFeature)
   }
 
   menuItems(county) {
-    return this.props.county.map((municipio, index) => (
+    return this.props.geoJsonFeature.map((municipio, index) => (
       <MenuItem 
         key={index} 
-        value={municipio.features.properties} 
-        primaryText={county.features[0].properties} />
+        value={municipio.features.properties.Municipio} 
+        primaryText={municipio.features.properties.Municipio} />
     ));
   }
 
