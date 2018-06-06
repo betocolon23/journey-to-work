@@ -49,10 +49,9 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             "selected": [],
-            municipios: geoJsonFeature.features.map(feature => feature.properties.Municipio),
+            municipios: geoJsonFeature.features.map(feature => feature.properties.Municipio).sort(),
             selectedOption: 'outbound',
             selected_county_csv: [[]]
-
         }
         this.handleChangeMunicipio = this.handleChangeMunicipio.bind(this);
         this.handleOptionChange = this.handleOptionChange.bind(this);
