@@ -13,7 +13,6 @@ import csvData from './csvData.js';
 const geoJsonFeature = require('./geoJsonData.json')
 const county_data = require('./county-data')
 
-
 const styles = {
     block: {
         maxWidth: 250,
@@ -34,29 +33,12 @@ const prettyLink = {
 };
 
 /* MAP VARS */
-var map;
-var county_inbound;
-var county_outbound;
-var newSelected;
-var geojson;
-var bound_array = [];
-var net_array = [];
-var absolute_net = [];
-var net_data = [];
-var inbound_calculation = [];
-var inbound_sumatory = 0;
-var municipio_name;
+var map, county_inbound, county_outbound, newSelected, geojson, list;
+var [bound_array, net_array, absolute_net, net_data, inbound_calculation, inbound_sumatory] = [[], [], [], [], [], 0];
 var inbound = document.getElementById('inbound');
 var outbound = document.getElementById('outbound');
 var net = document.getElementById('net');
-var intervalBreak;
-var firstBreak;
-var secondBreak;
-var thirdBreak;
-var fourthBreak;
-var fifthBreak;
-var legend;
-var info;
+var municipio_name, intervalBreak, firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak, legend, info;
 /* end map vars*/
 
 const county_csv_headers = ['County Name', 'Workers in Commuting Flow'];
@@ -67,9 +49,9 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             "selected": [],
-            // "data": {
-            //     fields: []
-            // },
+            "datos": {
+                fields: []
+            },
             selectedOption: 'outbound',
             selected_county_csv: [[]]
 
@@ -86,21 +68,13 @@ export default class App extends React.Component {
         outbound = document.getElementById('outbound');
         net = document.getElementById('net');
 
-        //Aqui estoy tratando de hacer un dropDown list de municipios 
-        //Como en los proyectos pasado pero a diferencia es que aqui la data ya esta local
-        //En los pasados era con fetch (data.restult)
-        //HELP
-        // })
-        // fetch('./geoJsonData.json')
-        //     .then(result => {
-        //         return result.json();
-        //     }).then(data => {
-        //         this.setState({ 
-        //             data: data.result,
-        //             selected: [data.result.fields.Municipio] 
-        //         })
-        //     })
+        console.log(geoJsonFeature.features);
 
+        //para el DropDown
+        list = geoJsonFeature.features.map(function (feature) {
+            return feature.properties.Municipio
+        })
+        console.log(list);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -491,7 +465,7 @@ export default class App extends React.Component {
                             className={"drop-down"}
                             onChange={this.handleChangeMunicipio}
                             selected={this.state.selected}
-                        // fields={this.state.data.fields}
+                            // list={this.props.list}
                         />
                         <div className="radio-container">
                             <div className="radio">

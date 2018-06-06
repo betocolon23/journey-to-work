@@ -33,7 +33,7 @@ export default class DropDown extends React.Component {
           value={this.props.selected}
           onChange={this.props.onChange}
         >
-        {/* {this.menuItems(this.props.county)} */}
+        {/* {this.menuItems(this.props.list)} */}
         </SelectField>
       </div>
     );
