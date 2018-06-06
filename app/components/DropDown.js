@@ -14,7 +14,6 @@ export default class DropDown extends React.Component {
   }
   
   menuItems(municipios) {
-    // console.log(this.props.list);
     return municipios.map((municipio, index) => (
       <MenuItem 
       key={index} 
@@ -34,7 +33,7 @@ export default class DropDown extends React.Component {
           value={this.props.selected}
           onChange={this.props.onChange}
         >
-        {/* {this.menuItems(this.props.municipios)}  */}
+        {this.menuItems(this.props.municipios)} 
         </SelectField>
       </div>
     );

@@ -33,7 +33,7 @@ const prettyLink = {
 };
 
 /* MAP VARS */
-var map, county_inbound, county_outbound, newSelected, geojson, municipios;
+var map, county_inbound, county_outbound, newSelected, geojson;
 var [bound_array, net_array, absolute_net, net_data, inbound_calculation, inbound_sumatory] = [[], [], [], [], [], 0];
 var inbound = document.getElementById('inbound');
 var outbound = document.getElementById('outbound');
@@ -49,9 +49,7 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             "selected": [],
-            "municipio_list": {
-                municipios: []
-            },
+            municipios: geoJsonFeature.features.map(feature => feature.properties.Municipio),
             selectedOption: 'outbound',
             selected_county_csv: [[]]
 
@@ -69,16 +67,7 @@ export default class App extends React.Component {
         net = document.getElementById('net');
 
         console.log(geoJsonFeature.features);
-
-        //para el DropDown
-        municipios = geoJsonFeature.features.map(function (feature) {
-            // this.setState({
-            //     municipio_list: geoJsonFeature.features,
-            //     selected: [municipio_list.properties.Municipio]
-            // })
-            return feature.properties.Municipio
-        })
-        console.log(municipios);
+        console.log(this.state.municipios);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -404,10 +393,6 @@ export default class App extends React.Component {
                             if (municipio_name === net_array[i][0]) {
                                 var county_net_clicked;
                                 county_net_clicked = inbound_sumatory - net_array[i][1]
-
-                                //Remover el valor del click seleccionado por el county_net_clicked 
-                                // net_array.splice([i][1], 1, county_net_clicked);
-                                // console.log(county_net_clicked);
                             }
                             absolute_net.push(Number(net_array[i][1]));
                             map._layers[key].setStyle({
@@ -469,7 +454,7 @@ export default class App extends React.Component {
                             className={"drop-down"}
                             onChange={this.handleChangeMunicipio}
                             selected={this.state.selected}
-                            // municipios={this.state.municipios}
+                            municipios={this.state.municipios}
                         />
                         <div className="radio-container">
                             <div className="radio">
