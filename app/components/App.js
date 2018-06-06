@@ -33,6 +33,32 @@ const prettyLink = {
     color: '#000'
 };
 
+/* MAP VARS */
+var map;
+var county_inbound;
+var county_outbound;
+var newSelected;
+var geojson;
+var bound_array = [];
+var net_array = [];
+var absolute_net = [];
+var net_data = [];
+var inbound_calculation = [];
+var inbound_sumatory = 0;
+var municipio_name;
+var inbound = document.getElementById('inbound');
+var outbound = document.getElementById('outbound');
+var net = document.getElementById('net');
+var intervalBreak;
+var firstBreak;
+var secondBreak;
+var thirdBreak;
+var fourthBreak;
+var fifthBreak;
+var legend;
+var info;
+/* end map vars*/
+
 const county_csv_headers = ['County Name', 'Workers in Commuting Flow'];
 var selected_county_csv = [[]];
 
@@ -46,36 +72,19 @@ export default class App extends React.Component {
             // },
             selectedOption: 'outbound',
             selected_county_csv: [[]]
-            
+
         }
         this.handleChangeMunicipio = this.handleChangeMunicipio.bind(this);
         this.handleOptionChange = this.handleOptionChange.bind(this);
     }
 
     componentDidMount() {
-        var map = L.map('map').setView([18.2208, -66.3500], 9);
-        var oldMap = map;
-        var county_inbound;
-        var county_outbound;
-        var geojson;
-        var bound_array = [];
-        var net_array = [];
-        var absolute_net = [];
-        var net_data = [];
-        var inbound_calculation = [];
-        var inbound_sumatory = 0;
-        var municipio_name;
-        var newSelected = this.state.selectedOption;
-        var inbound = document.getElementById('inbound');
-        var outbound = document.getElementById('outbound');
-        var net = document.getElementById('net');
-        var intervalBreak;
-        var firstBreak;
-        var secondBreak;
-        var thirdBreak;
-        var fourthBreak;
-        var fifthBreak;
-        var legend;
+        let app = this;
+        map = L.map('map').setView([18.2208, -66.3500], 9);
+        newSelected = this.state.selectedOption;
+        inbound = document.getElementById('inbound');
+        outbound = document.getElementById('outbound');
+        net = document.getElementById('net');
 
         //Aqui estoy tratando de hacer un dropDown list de municipios 
         //Como en los proyectos pasado pero a diferencia es que aqui la data ya esta local
@@ -96,8 +105,7 @@ export default class App extends React.Component {
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
         }).addTo(map);
-
-        var info = L.control();
+        info = L.control();
 
         info.onAdd = function (map) {
             this._div = L.DomUtil.create('div', 'info');
@@ -147,13 +155,13 @@ export default class App extends React.Component {
             return county_inbound;
         }
 
-        info.update = function (props) {
+        info.update = (props) => {
             if (props) {
                 if (outbound.checked) {
                     county_outbound = countyOutbound(county_data, props)
                     county_outbound = county_outbound.filter(Boolean);
                     console.log(county_outbound);
-                    this._div.innerHTML = (props ?
+                    info._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
@@ -164,7 +172,7 @@ export default class App extends React.Component {
                     county_inbound = countyInbound(county_data, props);
                     county_inbound = county_inbound.filter(Boolean);
                     console.log(county_inbound)
-                    this._div.innerHTML = (props ?
+                    info._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
@@ -176,7 +184,7 @@ export default class App extends React.Component {
                     county_inbound = countyInbound(county_data, props);
                     county_inbound = county_inbound.filter(Boolean);
                     for (var i = 0; i < county_inbound.length; i++) {
-                        for (var j = 0; j < county_outbound.length; j++) {                            
+                        for (var j = 0; j < county_outbound.length; j++) {
                             if (county_inbound[i][0] == county_outbound[j][0]) {
                                 //Array de county_inbound y county_outbound juntos 
                                 var net_data = [];
@@ -200,11 +208,11 @@ export default class App extends React.Component {
                                 function add(a, b) {
                                     return a + b
                                 }
-                                
+
                                 //Add county_outbound Municipio and coummuting flow to Array net_data
                                 net_data.push(county_outbound[j][0]);
                                 net_data.push(Number(county_outbound[j][1]));
-                                
+
                                 //Loop para restar inbound - outbound
                                 for (var k = 0; k < net_data.length; k++) {
                                     net_total = net_data[1] - net_data[3]
@@ -225,7 +233,7 @@ export default class App extends React.Component {
                                         net_data.push(clicked_element);
                                     }
                                 }
-                                
+
                                 net_data.splice(1, 1);
                                 net_data.splice(1, 1);
 
@@ -236,7 +244,7 @@ export default class App extends React.Component {
                         }
                     }
                     municipio_name = props.Municipio;
-                    this._div.innerHTML = (props ?
+                    info._div.innerHTML = (props ?
                         '<h4>' + props.Municipio + '</h4>'
                         : 'Click over a county');
                     console.log(net_array)
@@ -246,13 +254,11 @@ export default class App extends React.Component {
         };
         info.addTo(map);
 
-        //Esta funcion guarda el array del county seleccionado en la variable selected_county_csv
-        //para despues en el render bajarla como un csv. El problema es que el array empieza vacio no importa cuando haga click. 
-        //Esta funcion es llamanda en info.update = function(props) line 138
-        //Cada vez se hace un array nuevo. 
-        function csvCountyData(data) {
-            selected_county_csv = data
-        }
+        function csvCountyData(data)  {
+            console.log("Set data");
+            selected_county_csv = data;
+            app.setState({selected_county_csv : data});
+        };
 
         function featureStyle(feature) {
             return {
@@ -274,7 +280,7 @@ export default class App extends React.Component {
             serie.setSerie(bound_array);
             var intervalAmount = bound_array.length >= 5 ? 5 : bound_array.length;
             intervalBreak = serie.getClassJenks(intervalAmount);
-            var str = '<strong>Classification Method : <\/strong>' + serie.method +  " :\n";
+            var str = '<strong>Classification Method : <\/strong>' + serie.method + " :\n";
             str += '<div class="classes">';
             var ranges = serie.ranges;
             for (var i = 0; i < ranges.length; i++) {
@@ -314,7 +320,7 @@ export default class App extends React.Component {
             }
 
             legend = L.control({ position: 'bottomright' });
-              
+
             legend.onAdd = function (map) {
                 var div = L.DomUtil.create('div', 'info legend'),
                     grades = [firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak],
@@ -353,7 +359,7 @@ export default class App extends React.Component {
                 legend.remove();
             }
         }
-        
+
         function clickedFeature(e) {
             resetData();
 
@@ -411,7 +417,7 @@ export default class App extends React.Component {
                 // console.log(bound_array);
                 setJenks(bound_array);
             }
- 
+
             else if (net.checked) {
                 for (var key in map._layers) {
                     for (var i = 0; i < net_array.length; i++) {
@@ -485,7 +491,7 @@ export default class App extends React.Component {
                             className={"drop-down"}
                             onChange={this.handleChangeMunicipio}
                             selected={this.state.selected}
-                            // fields={this.state.data.fields}
+                        // fields={this.state.data.fields}
                         />
                         <div className="radio-container">
                             <div className="radio">
