@@ -12,16 +12,17 @@ export default class DropDown extends React.Component {
     };
     this.menuItems = this.menuItems.bind(this);
   }
-
+  
   menuItems(municipios) {
+    // console.log(this.props.list);
     return municipios.map((municipio, index) => (
       <MenuItem 
-        key={index} 
-        value={municipio} 
-        primaryText={municipio} />
+      key={index} 
+      value={municipio} 
+      primaryText={municipio} />
     ));
   }
-
+  
   render() {
     return (
       <div>
@@ -33,7 +34,7 @@ export default class DropDown extends React.Component {
           value={this.props.selected}
           onChange={this.props.onChange}
         >
-        {/* {this.menuItems(this.props.list)} */}
+        {/* {this.menuItems(this.props.municipios)}  */}
         </SelectField>
       </div>
     );
