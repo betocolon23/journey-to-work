@@ -35,10 +35,10 @@ const prettyLink = {
 /* MAP VARS */
 var map, county_inbound, county_outbound, newSelected, geojson;
 var [bound_array, net_array, absolute_net, net_data, inbound_calculation, inbound_sumatory] = [[], [], [], [], [], 0];
+var municipio_name, intervalBreak, firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak, legend, info;
 var inbound = document.getElementById('inbound');
 var outbound = document.getElementById('outbound');
 var net = document.getElementById('net');
-var municipio_name, intervalBreak, firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak, legend, info;
 /* end map vars*/
 
 const county_csv_headers = ['County Name', 'Workers in Commuting Flow'];
@@ -96,11 +96,11 @@ export default class App extends React.Component {
         }
 
         function getNetColor(d) {
-            return d > 1000 ? '#0066cc' :
-                d > 500 ? '#009900' :
-                    d > 100 ? '#ffff00' :
-                        d > 10 ? '#ffcc00' :
-                            '#ff0000';
+            return d > 1000 ? '#994d00' :
+                d > 500 ? '#cc6600' :
+                    d > 100 ? '#ffffb3' :
+                        d > 10 ? '#66ccff' :
+                            '#0066ff';
         }
 
         function countyOutbound(county_data, props) {
@@ -278,11 +278,11 @@ export default class App extends React.Component {
             }
 
             function getNetColor(d) {
-                return d > fifthBreak ? '#0066cc' :
-                    d > fourthBreak ? '#009900' :
-                        d > thirdBreak ? '#ffff00' :
-                            d > secondBreak ? '#ffcc00' :
-                                '#ff0000';
+                return d > fifthBreak ? '#994d00' :
+                    d > fourthBreak ? '#cc6600' :
+                        d > thirdBreak ? '#ffffb3' :
+                            d > secondBreak ? '#66ccff' :
+                                '#0066ff';
             }
 
             legend = L.control({ position: 'bottomright' });
