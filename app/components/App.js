@@ -65,8 +65,8 @@ export default class App extends React.Component {
         outbound = document.getElementById('outbound');
         net = document.getElementById('net');
 
-        console.log(geoJsonFeature.features);
-        console.log(this.state.municipios);
+        // console.log(geoJsonFeature.features);
+        // console.log(this.state.municipios);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -336,15 +336,17 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_outbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_outbound[i][0]) {
-                            bound_array.push(Number(county_outbound[i][1]));
-                            map._layers[key].setStyle({
-                                fillColor: '#FD8D3C',
-                                weight: 1,
-                                color: '#666',
-                                dashArray: '',
-                                fillOpacity: 0.7,
-                                fillColor: getOutboundColor(county_outbound[i][1])
-                            });
+                            // if (map._layers[key].feature && map._layers[key].feature.properties.Municipio  === this.state.selected) {
+                                bound_array.push(Number(county_outbound[i][1]));
+                                map._layers[key].setStyle({
+                                    fillColor: '#FD8D3C',
+                                    weight: 1,
+                                    color: '#666',
+                                    dashArray: '',
+                                    fillOpacity: 0.7,
+                                    fillColor: getOutboundColor(county_outbound[i][1])
+                                });
+                            // }
                         }
                     }
                     layer.setStyle({
@@ -414,6 +416,8 @@ export default class App extends React.Component {
                 // console.log(net_array);
                 setJenks(absolute_net);
             }
+
+
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 layer.bringToFront();
             }
@@ -444,6 +448,7 @@ export default class App extends React.Component {
     }
 
     render() {
+        console.log(this.state.selected);
         return (
             <Paper>
                 <div className={'full-container'}>
