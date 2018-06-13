@@ -29,7 +29,7 @@ export default class DropDown extends React.Component {
           floatingLabelText="Select County" 
           style={{ width: '300px' }}
           autoWidth={false}
-          multiple={true}
+          multiple={false}
           value={this.props.selected}
           onChange={this.props.onChange}
         >

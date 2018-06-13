@@ -12,7 +12,7 @@ import csvData from './csvData.js';
 //data
 const geoJsonFeature = require('./geoJsonData.json')
 const county_data = require('./county-data')
-
+var clickedFeature;
 const styles = {
     block: {
         maxWidth: 250,
@@ -220,10 +220,10 @@ export default class App extends React.Component {
         };
         info.addTo(map);
 
-        function csvCountyData(data)  {
+        function csvCountyData(data) {
             console.log("Set data");
             selected_county_csv = data;
-            app.setState({selected_county_csv : data});
+            app.setState({ selected_county_csv: data });
         };
 
         function featureStyle(feature) {
@@ -326,12 +326,12 @@ export default class App extends React.Component {
             }
         }
 
-        function clickedFeature(e) {
+        clickedFeature = function (e) {
             resetData();
-
+            //console.log(map._layers)
             var layer = e.target;
             info.update(layer.feature.properties);
-
+            //console.log(layer)
             if (outbound.checked) {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_outbound.length; i++) {
@@ -339,15 +339,15 @@ export default class App extends React.Component {
                             // map._layers es el objeto que contiene las propiedades del Mapa feature.properties.Municipio es cada uno
                             //Aqui trate de igualar ese Municipio clicked con el state del dropDown this.state.selected.
                             // if (map._layers[key].feature && map._layers[key].feature.properties.Municipio  === this.state.selected) {
-                                bound_array.push(Number(county_outbound[i][1]));
-                                map._layers[key].setStyle({
-                                    fillColor: '#FD8D3C',
-                                    weight: 1,
-                                    color: '#666',
-                                    dashArray: '',
-                                    fillOpacity: 0.7,
-                                    fillColor: getOutboundColor(county_outbound[i][1])
-                                });
+                            bound_array.push(Number(county_outbound[i][1]));
+                            map._layers[key].setStyle({
+                                fillColor: '#FD8D3C',
+                                weight: 1,
+                                color: '#666',
+                                dashArray: '',
+                                fillOpacity: 0.7,
+                                fillColor: getOutboundColor(county_outbound[i][1])
+                            });
                             // }
                         }
                     }
@@ -441,8 +441,24 @@ export default class App extends React.Component {
         map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census</a>');
     }
 
-    handleChangeMunicipio(event, index, value) {
-        this.setState({ selected: value });
+    handleChangeMunicipio(event, index, val) {
+        let e = {};
+        console.log("value is: " +val)
+        this.setState({ selected: val });
+        for (const [key, value] of Object.entries(map._layers)) {
+            //console.log(key)
+            //console.log(map._layers)
+            if (map._layers[key].feature) {
+                console.log('.' + map._layers[key].feature.properties.Municipio + '. == .' + val +  '.')
+                console.log(map._layers[key].feature.properties.Municipio.toString().trim() === val.toString().trim());
+            }
+            if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === val ) {
+                e.target = map._layers[key]
+                //console.log(e)
+                clickedFeature(e)
+                return;
+            }
+        }
     }
 
     handleOptionChange(changeEvent) {
