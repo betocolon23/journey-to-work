@@ -336,6 +336,8 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_outbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_outbound[i][0]) {
+                            // map._layers es el objeto que contiene las propiedades del Mapa feature.properties.Municipio es cada uno
+                            //Aqui trate de igualar ese Municipio clicked con el state del dropDown this.state.selected.
                             // if (map._layers[key].feature && map._layers[key].feature.properties.Municipio  === this.state.selected) {
                                 bound_array.push(Number(county_outbound[i][1]));
                                 map._layers[key].setStyle({
