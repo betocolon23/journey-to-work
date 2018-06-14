@@ -96,11 +96,11 @@ export default class App extends React.Component {
         }
 
         function getNetColor(d) {
-            return d > 1000 ? '#994d00' :
-                d > 500 ? '#cc6600' :
+            return  d > 1000 ? '#cc6600' :
+                d > 500 ? '#ff8000' :
                     d > 100 ? '#ffffb3' :
-                        d > 10 ? '#66ccff' :
-                            '#0066ff';
+                        d > 10 ? '#80ff80' :
+                                    '#00ff00';
         }
 
         function countyOutbound(county_data, props) {
@@ -278,11 +278,11 @@ export default class App extends React.Component {
             }
 
             function getNetColor(d) {
-                return d > fifthBreak ? '#994d00' :
-                    d > fourthBreak ? '#cc6600' :
+                return d > fifthBreak ? '#cc6600' :
+                d > fourthBreak ? '#ff8000' :
                         d > thirdBreak ? '#ffffb3' :
-                            d > secondBreak ? '#66ccff' :
-                                '#0066ff';
+                            d > secondBreak ? '#80ff80' :
+                                '#00ff00';
             }
 
             legend = L.control({ position: 'bottomright' });
