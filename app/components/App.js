@@ -128,7 +128,7 @@ export default class App extends React.Component {
                     county_outbound = county_outbound.filter(Boolean);
                     console.log(county_outbound);
                     info._div.innerHTML = (props ?
-                        '<h4>' + props.Municipio + '</h4>'
+                        '<h4>' + 'Outbound: ' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
                     csvCountyData(county_outbound);
@@ -139,7 +139,7 @@ export default class App extends React.Component {
                     county_inbound = county_inbound.filter(Boolean);
                     console.log(county_inbound)
                     info._div.innerHTML = (props ?
-                        '<h4>' + props.Municipio + '</h4>'
+                        '<h4>' + 'Inbound: ' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
                     csvCountyData(county_inbound);
@@ -211,7 +211,7 @@ export default class App extends React.Component {
                     }
                     municipio_name = props.Municipio;
                     info._div.innerHTML = (props ?
-                        '<h4>' + props.Municipio + '</h4>'
+                        '<h4>' + 'Net: ' + props.Municipio + '</h4>'
                         : 'Click over a county');
                     console.log(net_array)
                     csvCountyData(net_array);
@@ -336,9 +336,6 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_outbound.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === county_outbound[i][0]) {
-                            // map._layers es el objeto que contiene las propiedades del Mapa feature.properties.Municipio es cada uno
-                            //Aqui trate de igualar ese Municipio clicked con el state del dropDown this.state.selected.
-                            // if (map._layers[key].feature && map._layers[key].feature.properties.Municipio  === this.state.selected) {
                             bound_array.push(Number(county_outbound[i][1]));
                             map._layers[key].setStyle({
                                 fillColor: '#FD8D3C',
@@ -348,7 +345,6 @@ export default class App extends React.Component {
                                 fillOpacity: 0.7,
                                 fillColor: getOutboundColor(county_outbound[i][1])
                             });
-                            // }
                         }
                     }
                     layer.setStyle({
@@ -448,10 +444,10 @@ export default class App extends React.Component {
         for (const [key, value] of Object.entries(map._layers)) {
             //console.log(key)
             //console.log(map._layers)
-            if (map._layers[key].feature) {
-                console.log('.' + map._layers[key].feature.properties.Municipio + '. == .' + val +  '.')
-                console.log(map._layers[key].feature.properties.Municipio.toString().trim() === val.toString().trim());
-            }
+            // if (map._layers[key].feature) {
+            //     console.log('.' + map._layers[key].feature.properties.Municipio + '. == .' + val +  '.')
+            //     console.log(map._layers[key].feature.properties.Municipio.toString().trim() === val.toString().trim());
+            // }
             if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === val ) {
                 e.target = map._layers[key]
                 //console.log(e)
@@ -470,7 +466,7 @@ export default class App extends React.Component {
         return (
             <Paper>
                 <div className={'full-container'}>
-                    <div className={'title'}>Puerto Rico Journey to Work Map </div>
+                    {/* <div className={'title'}>Puerto Rico Journey to Work Map </div> */}
                     <div className={"top-container"}>
                         <DropDown
                             className={"drop-down"}

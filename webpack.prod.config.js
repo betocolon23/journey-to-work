@@ -9,7 +9,7 @@ var HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
 
 module.exports = {
     entry: {
-        grafica: __dirname + '/app/index.js',
+        map: __dirname + '/app/index.js',
         vendor: ['react','react-dom','recharts']
     },
     module: {
