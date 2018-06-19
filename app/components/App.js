@@ -36,6 +36,7 @@ const prettyLink = {
 var map, county_inbound, county_outbound, newSelected, geojson;
 var [bound_array, net_array, absolute_net, net_data, inbound_calculation, inbound_sumatory] = [[], [], [], [], [], 0];
 var municipio_name, intervalBreak, firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak, legend, info;
+var mixed_array = [];
 var inbound = document.getElementById('inbound');
 var outbound = document.getElementById('outbound');
 var net = document.getElementById('net');
@@ -151,46 +152,70 @@ export default class App extends React.Component {
                     county_inbound = county_inbound.filter(Boolean);
                     for (var i = 0; i < county_inbound.length; i++) {
                         for (var j = 0; j < county_outbound.length; j++) {
+
+                        Array.prototype.diff = function(a) {
+                            return this.filter(function(i) {return a.indexOf(i) < 0;});
+                        };
+
+                        // var dif1 = county_inbound.diff(county_outbound);  
+                        // console.log(dif1); // => [1, 2, 6]
+
+
+                        // console.log(mixed_array);
+                        
+                        
+                        for (var x = 0; x < mixed_array.length; x++) {
+                            // if (mixed_array[x][0] === mixed_array[0]) {
+                                var resta;
+                                Number(mixed_array[x][1]);
+                                // console.log(Number(mixed_array[x][1]));
+                                resta = mixed_array[x][1] - mixed_array[x][1];
+                                // console.log(resta);
+                                // }  
+                            }
+                            
                             if (county_inbound[i][0] == county_outbound[j][0]) {
                                 //Array de county_inbound y county_outbound juntos 
                                 var net_data = [];
-
+                                
+                                // console.log(county_outbound);
+                                // console.log(county_inbound)
                                 //Variable para hacer el calculo de la resta de inbound y outbound
                                 var net_total;
-
-                                //Add county_inbound Municipio and commuting flow to Array net_data
+                                
+                                //Add county_inbound Municipio and commuting flow to Array net_data esto crea un array de inbound solamente 
                                 net_data.push(county_inbound[i][0]);
                                 net_data.push(Number(county_inbound[i][1]));
-
-                                // Calculate Inbound Sumatory
+                                
+                                // Calculate Inbound Sumatory suma todos los valores del inbound 
                                 var get_inbound_selected;
                                 get_inbound_selected = (Number(county_inbound[i][1]));
-
+                                
                                 //inbound array para caluclar sumatoria 
                                 inbound_calculation.push(get_inbound_selected);
-
+                                
                                 //Inbound Sumatory para pasarla al mapa 
                                 inbound_sumatory = inbound_calculation.reduce(add, 0);
                                 function add(a, b) {
                                     return a + b
                                 }
-
+                                
                                 //Add county_outbound Municipio and coummuting flow to Array net_data
                                 net_data.push(county_outbound[j][0]);
                                 net_data.push(Number(county_outbound[j][1]));
-
+                                
                                 //Loop para restar inbound - outbound
                                 for (var k = 0; k < net_data.length; k++) {
                                     net_total = net_data[1] - net_data[3]
                                 }
-
+                                
                                 //Add net_total to each array 
                                 net_data.push(net_total);
-
+                                
                                 //Remover los valores repetidos en net_data y pasarlos a net array
                                 net_data = Array.from(new Set(net_data));
                                 // console.log(net_data);
-
+                                
                                 //Check Shortest Array 
                                 var clicked_element;
                                 for (var z = 0; z < net_data.length; z++) {
@@ -199,16 +224,33 @@ export default class App extends React.Component {
                                         net_data.push(clicked_element);
                                     }
                                 }
-
+                                
                                 net_data.splice(1, 1);
                                 net_data.splice(1, 1);
-
+                                
                                 //Net Array Global
                                 net_array.push(net_data);
                             }
                             //Find function comprar arreglos si esta undefinded no esta los que estan se añaden al array    
                         }
                     }
+                    mixed_array = county_inbound.concat(county_outbound);
+
+                    console.log(mixed_array);
+                    
+                    
+                    var result = mixed_array.shift().reduce(function(res, v) {
+                            if (res.indexOf(v) === -1 && mixed_array.every(function(a) {
+                                    return a.indexOf(v) !== -1;
+                                })) res.push(v);
+                                return res;
+                            }, []);
+                            
+                            console.log(result);
+                            
+                            
+                            
+
                     municipio_name = props.Municipio;
                     info._div.innerHTML = (props ?
                         '<h4>' + 'Net: ' + props.Municipio + '</h4>'
@@ -221,7 +263,7 @@ export default class App extends React.Component {
         info.addTo(map);
 
         function csvCountyData(data) {
-            console.log("Set data");
+            // console.log("Set data");
             selected_county_csv = data;
             app.setState({ selected_county_csv: data });
         };
@@ -388,7 +430,8 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < net_array.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === net_array[i][0]) {
-                            //Codigo para calcular el municipio clicked 
+
+                            //Codigo para calcular el valor neto del municipio seleccionado 
                             if (municipio_name === net_array[i][0]) {
                                 var county_net_clicked;
                                 county_net_clicked = inbound_sumatory - net_array[i][1]
@@ -439,7 +482,7 @@ export default class App extends React.Component {
 
     handleChangeMunicipio(event, index, val) {
         let e = {};
-        console.log("value is: " +val)
+        // console.log("value is: " +val)
         this.setState({ selected: val });
         for (const [key, value] of Object.entries(map._layers)) {
             //console.log(key)
