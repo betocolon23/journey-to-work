@@ -26,7 +26,7 @@ export default class DropDown extends React.Component {
     return (
       <div>
         <SelectField
-          floatingLabelText="Select County" 
+          floatingLabelText="Seleccionar Municipio" 
           style={{ width: '300px' }}
           autoWidth={false}
           multiple={false}

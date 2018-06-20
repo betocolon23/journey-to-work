@@ -1,6 +1,6 @@
 export default function csvData() {
    return [
-        ['County Code Residence', 'County Name', 'County Code Place of Work', 'County Name', 'Workers in Commuting Flow'],
+        ['Codigo de Municipio Emisor', 'Municipio Emisor', 'Codigo de Municipio Receptor', 'Municpio Receptor', 'Numero de Trabajadores'],
         ['72001', 'Adjuntas ', '72001', 'Adjuntas ', '2319'],
         ['72001', 'Adjuntas ', '72013', 'Arecibo ', '20'],
         ['72001', 'Adjuntas ', '72021', 'Bayamon ', '13'],

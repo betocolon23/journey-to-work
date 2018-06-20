@@ -42,7 +42,7 @@ var outbound = document.getElementById('outbound');
 var net = document.getElementById('net');
 /* end map vars*/
 
-const county_csv_headers = ['County Name', 'Workers in Commuting Flow'];
+const county_csv_headers = ['Municipio', 'Numero de Trabajadores'];
 var selected_county_csv = [[]];
 
 export default class App extends React.Component {
@@ -146,7 +146,7 @@ export default class App extends React.Component {
                     csvCountyData(county_inbound);
                 }
                 else {
-                    county_outbound = countyOutbound(county_data, props)
+                    county_outbound = countyOutbound(county_data, props) 
                     county_outbound = county_outbound.filter(Boolean);
                     county_inbound = countyInbound(county_data, props);
                     county_inbound = county_inbound.filter(Boolean);
@@ -234,10 +234,9 @@ export default class App extends React.Component {
                             //Find function comprar arreglos si esta undefinded no esta los que estan se añaden al array    
                         }
                     }
-                    mixed_array = county_inbound.concat(county_outbound);
 
+                    mixed_array = county_inbound.concat(county_outbound);
                     console.log(mixed_array);
-                    
                     
                     var result = mixed_array.shift().reduce(function(res, v) {
                             if (res.indexOf(v) === -1 && mixed_array.every(function(a) {
@@ -246,7 +245,7 @@ export default class App extends React.Component {
                                 return res;
                             }, []);
                             
-                            console.log(result);
+                    console.log(result); 
                             
                             
                             
@@ -332,7 +331,7 @@ export default class App extends React.Component {
             legend.onAdd = function (map) {
                 var div = L.DomUtil.create('div', 'info legend'),
                     grades = [firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak],
-                    labels = ['<strong>Commuting by County</strong>'],
+                    labels = ['<strong>Desplazamiento de Trabajadores por Municipio</strong>'],
                     from, to;
 
                 for (var i = 0; i < grades.length; i++) {
@@ -526,7 +525,7 @@ export default class App extends React.Component {
                                         onChange={this.handleOptionChange}
                                         id='outbound'
                                     />
-                                    Outbound
+                                    Salidas
                                 </label>
                             </div>
                             <div className="radio">
@@ -537,7 +536,7 @@ export default class App extends React.Component {
                                         onChange={this.handleOptionChange}
                                         id='inbound'
                                     />
-                                    Inbound
+                                    Entradas
                                 </label>
                             </div>
                             <div className="radio">
@@ -548,16 +547,16 @@ export default class App extends React.Component {
                                         onChange={this.handleOptionChange}
                                         id='net'
                                     />
-                                    Net
+                                    Neto
                                 </label>
                             </div>
                         </div>
                         <div className={"csv-class"}>
                             <div className={'csv-link'}>
-                                <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Export to Excel ⬇ </CSVLink>
+                                <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Exportar Datos Completos a Excel ⬇ </CSVLink>
                             </div>
                             <div className={'csv-link'}>
-                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Export Selected to Excel ⬇</CSVLink>
+                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Exportar Municipio Seleccionado a Excel ⬇</CSVLink>
                             </div>
                         </div>
                     </div>
