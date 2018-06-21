@@ -410,12 +410,6 @@ export default class App extends React.Component {
         // console.log("value is: " +val)
         this.setState({ selected: val });
         for (const [key, value] of Object.entries(map._layers)) {
-            //console.log(key)
-            //console.log(map._layers)
-            // if (map._layers[key].feature) {
-            //     console.log('.' + map._layers[key].feature.properties.Municipio + '. == .' + val +  '.')
-            //     console.log(map._layers[key].feature.properties.Municipio.toString().trim() === val.toString().trim());
-            // }
             if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === val ) {
                 e.target = map._layers[key]
                 //console.log(e)
