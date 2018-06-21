@@ -36,12 +36,13 @@ const prettyLink = {
 var map, county_inbound, county_outbound, newSelected, geojson;
 var [bound_array, net_array, absolute_net, net_data, inbound_calculation, inbound_sumatory] = [[], [], [], [], [], 0];
 var municipio_name, intervalBreak, firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak, legend, info;
+var mixed_array = [];
 var inbound = document.getElementById('inbound');
 var outbound = document.getElementById('outbound');
 var net = document.getElementById('net');
 /* end map vars*/
 
-const county_csv_headers = ['County Name', 'Workers in Commuting Flow'];
+const county_csv_headers = ['Municipio', 'Numero de Trabajadores'];
 var selected_county_csv = [[]];
 
 export default class App extends React.Component {
@@ -145,70 +146,35 @@ export default class App extends React.Component {
                     csvCountyData(county_inbound);
                 }
                 else {
-                    county_outbound = countyOutbound(county_data, props)
+                    county_outbound = countyOutbound(county_data, props) 
                     county_outbound = county_outbound.filter(Boolean);
                     county_inbound = countyInbound(county_data, props);
                     county_inbound = county_inbound.filter(Boolean);
+                    let county;
                     for (var i = 0; i < county_inbound.length; i++) {
-                        for (var j = 0; j < county_outbound.length; j++) {
-                            if (county_inbound[i][0] == county_outbound[j][0]) {
-                                //Array de county_inbound y county_outbound juntos 
-                                var net_data = [];
+                        county = county_outbound.find(function(county_arr) {
+                            return county_inbound[i][0] === county_arr[0];
+                        });
 
-                                //Variable para hacer el calculo de la resta de inbound y outbound
-                                var net_total;
-
-                                //Add county_inbound Municipio and commuting flow to Array net_data
-                                net_data.push(county_inbound[i][0]);
-                                net_data.push(Number(county_inbound[i][1]));
-
-                                // Calculate Inbound Sumatory
-                                var get_inbound_selected;
-                                get_inbound_selected = (Number(county_inbound[i][1]));
-
-                                //inbound array para caluclar sumatoria 
-                                inbound_calculation.push(get_inbound_selected);
-
-                                //Inbound Sumatory para pasarla al mapa 
-                                inbound_sumatory = inbound_calculation.reduce(add, 0);
-                                function add(a, b) {
-                                    return a + b
-                                }
-
-                                //Add county_outbound Municipio and coummuting flow to Array net_data
-                                net_data.push(county_outbound[j][0]);
-                                net_data.push(Number(county_outbound[j][1]));
-
-                                //Loop para restar inbound - outbound
-                                for (var k = 0; k < net_data.length; k++) {
-                                    net_total = net_data[1] - net_data[3]
-                                }
-
-                                //Add net_total to each array 
-                                net_data.push(net_total);
-
-                                //Remover los valores repetidos en net_data y pasarlos a net array
-                                net_data = Array.from(new Set(net_data));
-                                // console.log(net_data);
-
-                                //Check Shortest Array 
-                                var clicked_element;
-                                for (var z = 0; z < net_data.length; z++) {
-                                    if (net_data.length == 3) {
-                                        clicked_element = net_data[1]
-                                        net_data.push(clicked_element);
-                                    }
-                                }
-
-                                net_data.splice(1, 1);
-                                net_data.splice(1, 1);
-
-                                //Net Array Global
-                                net_array.push(net_data);
-                            }
-                            //Find function comprar arreglos si esta undefinded no esta los que estan se añaden al array    
+                        if (county) {
+                            net_array.push([county[0], (Number(county_inbound[i][1]) - Number(county[1]))]);
+                        } else {
+                            net_array.push( [county_inbound[i][0], Number(county_inbound[i][1])] );
                         }
+
                     }
+
+                    for (var j = 0; j < county_outbound.length; j++) {
+                        county = county_inbound.find(function(county_arr) {
+                            return county_outbound[j][0] === county_arr[0];
+                        });
+
+                        if (!county) {
+                            net_array.push( [county_outbound[j][0], Number(county_outbound[j][1])] );
+                        }
+                    }                            
+                            
+
                     municipio_name = props.Municipio;
                     info._div.innerHTML = (props ?
                         '<h4>' + 'Net: ' + props.Municipio + '</h4>'
@@ -221,7 +187,7 @@ export default class App extends React.Component {
         info.addTo(map);
 
         function csvCountyData(data) {
-            console.log("Set data");
+            // console.log("Set data");
             selected_county_csv = data;
             app.setState({ selected_county_csv: data });
         };
@@ -245,6 +211,7 @@ export default class App extends React.Component {
             var serie = new geostats();
             serie.setSerie(bound_array);
             var intervalAmount = bound_array.length >= 5 ? 5 : bound_array.length;
+
             intervalBreak = serie.getClassJenks(intervalAmount);
             var str = '<strong>Classification Method : <\/strong>' + serie.method + " :\n";
             str += '<div class="classes">';
@@ -290,7 +257,7 @@ export default class App extends React.Component {
             legend.onAdd = function (map) {
                 var div = L.DomUtil.create('div', 'info legend'),
                     grades = [firstBreak, secondBreak, thirdBreak, fourthBreak, fifthBreak],
-                    labels = ['<strong>Commuting by County</strong>'],
+                    labels = ['<strong>Desplazamiento de Trabajadores por Municipio</strong>'],
                     from, to;
 
                 for (var i = 0; i < grades.length; i++) {
@@ -388,11 +355,12 @@ export default class App extends React.Component {
                 for (var key in map._layers) {
                     for (var i = 0; i < net_array.length; i++) {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === net_array[i][0]) {
-                            //Codigo para calcular el municipio clicked 
-                            if (municipio_name === net_array[i][0]) {
-                                var county_net_clicked;
-                                county_net_clicked = inbound_sumatory - net_array[i][1]
-                            }
+
+                            //Codigo para calcular el valor neto del municipio seleccionado 
+                            // if (municipio_name === net_array[i][0]) {
+                            //     var county_net_clicked;
+                            //     county_net_clicked = inbound_sumatory - net_array[i][1]
+                            // }
                             absolute_net.push(Number(net_array[i][1]));
                             map._layers[key].setStyle({
                                 fillColor: '#FC4E2A',
@@ -439,7 +407,7 @@ export default class App extends React.Component {
 
     handleChangeMunicipio(event, index, val) {
         let e = {};
-        console.log("value is: " +val)
+        // console.log("value is: " +val)
         this.setState({ selected: val });
         for (const [key, value] of Object.entries(map._layers)) {
             //console.log(key)
@@ -483,7 +451,7 @@ export default class App extends React.Component {
                                         onChange={this.handleOptionChange}
                                         id='outbound'
                                     />
-                                    Outbound
+                                    Salidas
                                 </label>
                             </div>
                             <div className="radio">
@@ -494,7 +462,7 @@ export default class App extends React.Component {
                                         onChange={this.handleOptionChange}
                                         id='inbound'
                                     />
-                                    Inbound
+                                    Entradas
                                 </label>
                             </div>
                             <div className="radio">
@@ -505,16 +473,16 @@ export default class App extends React.Component {
                                         onChange={this.handleOptionChange}
                                         id='net'
                                     />
-                                    Net
+                                    Neto
                                 </label>
                             </div>
                         </div>
                         <div className={"csv-class"}>
                             <div className={'csv-link'}>
-                                <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Export to Excel ⬇ </CSVLink>
+                                <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Exportar Datos Completos a Excel ⬇ </CSVLink>
                             </div>
                             <div className={'csv-link'}>
-                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Export Selected to Excel ⬇</CSVLink>
+                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Exportar Municipio Seleccionado a Excel ⬇</CSVLink>
                             </div>
                         </div>
                     </div>
