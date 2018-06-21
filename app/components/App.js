@@ -66,8 +66,6 @@ export default class App extends React.Component {
         outbound = document.getElementById('outbound');
         net = document.getElementById('net');
 
-        // console.log(geoJsonFeature.features);
-        // console.log(this.state.municipios);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
@@ -295,10 +293,8 @@ export default class App extends React.Component {
 
         clickedFeature = function (e) {
             resetData();
-            //console.log(map._layers)
             var layer = e.target;
             info.update(layer.feature.properties);
-            //console.log(layer)
             if (outbound.checked) {
                 for (var key in map._layers) {
                     for (var i = 0; i < county_outbound.length; i++) {
