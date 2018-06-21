@@ -150,104 +150,29 @@ export default class App extends React.Component {
                     county_outbound = county_outbound.filter(Boolean);
                     county_inbound = countyInbound(county_data, props);
                     county_inbound = county_inbound.filter(Boolean);
+                    let county;
                     for (var i = 0; i < county_inbound.length; i++) {
-                        for (var j = 0; j < county_outbound.length; j++) {
+                        county = county_outbound.find(function(county_arr) {
+                            return county_inbound[i][0] === county_arr[0];
+                        });
 
-                        Array.prototype.diff = function(a) {
-                            return this.filter(function(i) {return a.indexOf(i) < 0;});
-                        };
-
-                        // var dif1 = county_inbound.diff(county_outbound);  
-                        // console.log(dif1); // => [1, 2, 6]
-
-
-                        // console.log(mixed_array);
-                        
-                        
-                        for (var x = 0; x < mixed_array.length; x++) {
-                            // if (mixed_array[x][0] === mixed_array[0]) {
-                                var resta;
-                                Number(mixed_array[x][1]);
-                                // console.log(Number(mixed_array[x][1]));
-                                resta = mixed_array[x][1] - mixed_array[x][1];
-                                // console.log(resta);
-                                // }  
-                            }
-                            
-                            if (county_inbound[i][0] == county_outbound[j][0]) {
-                                //Array de county_inbound y county_outbound juntos 
-                                var net_data = [];
-                                
-                                // console.log(county_outbound);
-                                // console.log(county_inbound)
-                                //Variable para hacer el calculo de la resta de inbound y outbound
-                                var net_total;
-                                
-                                //Add county_inbound Municipio and commuting flow to Array net_data esto crea un array de inbound solamente 
-                                net_data.push(county_inbound[i][0]);
-                                net_data.push(Number(county_inbound[i][1]));
-                                
-                                // Calculate Inbound Sumatory suma todos los valores del inbound 
-                                var get_inbound_selected;
-                                get_inbound_selected = (Number(county_inbound[i][1]));
-                                
-                                //inbound array para caluclar sumatoria 
-                                inbound_calculation.push(get_inbound_selected);
-                                
-                                //Inbound Sumatory para pasarla al mapa 
-                                inbound_sumatory = inbound_calculation.reduce(add, 0);
-                                function add(a, b) {
-                                    return a + b
-                                }
-                                
-                                //Add county_outbound Municipio and coummuting flow to Array net_data
-                                net_data.push(county_outbound[j][0]);
-                                net_data.push(Number(county_outbound[j][1]));
-                                
-                                //Loop para restar inbound - outbound
-                                for (var k = 0; k < net_data.length; k++) {
-                                    net_total = net_data[1] - net_data[3]
-                                }
-                                
-                                //Add net_total to each array 
-                                net_data.push(net_total);
-                                
-                                //Remover los valores repetidos en net_data y pasarlos a net array
-                                net_data = Array.from(new Set(net_data));
-                                // console.log(net_data);
-                                
-                                //Check Shortest Array 
-                                var clicked_element;
-                                for (var z = 0; z < net_data.length; z++) {
-                                    if (net_data.length == 3) {
-                                        clicked_element = net_data[1]
-                                        net_data.push(clicked_element);
-                                    }
-                                }
-                                
-                                net_data.splice(1, 1);
-                                net_data.splice(1, 1);
-                                
-                                //Net Array Global
-                                net_array.push(net_data);
-                            }
-                            //Find function comprar arreglos si esta undefinded no esta los que estan se añaden al array    
+                        if (county) {
+                            net_array.push([county[0], (Number(county_inbound[i][1]) - Number(county[1]))]);
+                        } else {
+                            net_array.push( [county_inbound[i][0], Number(county_inbound[i][1])] );
                         }
+
                     }
 
-                    mixed_array = county_inbound.concat(county_outbound);
-                    console.log(mixed_array);
-                    
-                    var result = mixed_array.shift().reduce(function(res, v) {
-                            if (res.indexOf(v) === -1 && mixed_array.every(function(a) {
-                                    return a.indexOf(v) !== -1;
-                                })) res.push(v);
-                                return res;
-                            }, []);
-                            
-                    console.log(result); 
-                            
-                            
+                    for (var j = 0; j < county_outbound.length; j++) {
+                        county = county_inbound.find(function(county_arr) {
+                            return county_outbound[j][0] === county_arr[0];
+                        });
+
+                        if (!county) {
+                            net_array.push( [county_outbound[j][0], Number(county_outbound[j][1])] );
+                        }
+                    }                            
                             
 
                     municipio_name = props.Municipio;
@@ -286,6 +211,7 @@ export default class App extends React.Component {
             var serie = new geostats();
             serie.setSerie(bound_array);
             var intervalAmount = bound_array.length >= 5 ? 5 : bound_array.length;
+
             intervalBreak = serie.getClassJenks(intervalAmount);
             var str = '<strong>Classification Method : <\/strong>' + serie.method + " :\n";
             str += '<div class="classes">';
@@ -431,10 +357,10 @@ export default class App extends React.Component {
                         if (map._layers[key].feature && map._layers[key].feature.properties.Municipio === net_array[i][0]) {
 
                             //Codigo para calcular el valor neto del municipio seleccionado 
-                            if (municipio_name === net_array[i][0]) {
-                                var county_net_clicked;
-                                county_net_clicked = inbound_sumatory - net_array[i][1]
-                            }
+                            // if (municipio_name === net_array[i][0]) {
+                            //     var county_net_clicked;
+                            //     county_net_clicked = inbound_sumatory - net_array[i][1]
+                            // }
                             absolute_net.push(Number(net_array[i][1]));
                             map._layers[key].setStyle({
                                 fillColor: '#FC4E2A',
