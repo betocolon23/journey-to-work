@@ -12,6 +12,7 @@ import csvData from './csvData.js';
 //data
 const geoJsonFeature = require('./geoJsonData.json')
 const county_data = require('./county-data')
+
 var clickedFeature;
 const styles = {
     block: {
@@ -66,6 +67,15 @@ export default class App extends React.Component {
         outbound = document.getElementById('outbound');
         net = document.getElementById('net');
 
+        // fetch('https://datos.estadisticas.pr/dataset/081ab748-bb52-4e0c-81ae-319844d3e423/resource/38dd86ab-beb5-4952-a95b-09de5af886ca/download/county-data.json')
+        //     .then(result => {
+        //         return result.json();
+        //     }).then(county_data => {
+        //         console.log(county_data)
+        //         this.setState({ 
+        //             county_data: county_data.result 
+        //         })
+        //     })
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmV0b2NvbG9uMjMiLCJhIjoiY2pmMWNuY2g1MDdtaDJ5bG44aGFoNmdlZCJ9.L_4W1fZnk7hMCwmS71Lg1w', {
             id: 'mapbox.light',
