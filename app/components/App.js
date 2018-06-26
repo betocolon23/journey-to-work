@@ -137,7 +137,7 @@ export default class App extends React.Component {
                     county_outbound = county_outbound.filter(Boolean);
                     console.log(county_outbound);
                     info._div.innerHTML = (props ?
-                        '<h4>' + 'Outbound: ' + props.Municipio + '</h4>'
+                        '<h4>' + 'Salidas: ' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
                     csvCountyData(county_outbound);
@@ -148,7 +148,7 @@ export default class App extends React.Component {
                     county_inbound = county_inbound.filter(Boolean);
                     console.log(county_inbound)
                     info._div.innerHTML = (props ?
-                        '<h4>' + 'Inbound: ' + props.Municipio + '</h4>'
+                        '<h4>' + 'Entradas: ' + props.Municipio + '</h4>'
                         : 'Click over a county');
 
                     csvCountyData(county_inbound);
@@ -185,7 +185,7 @@ export default class App extends React.Component {
 
                     municipio_name = props.Municipio;
                     info._div.innerHTML = (props ?
-                        '<h4>' + 'Net: ' + props.Municipio + '</h4>'
+                        '<h4>' + 'Neto: ' + props.Municipio + '</h4>'
                         : 'Click over a county');
                     console.log(net_array)
                     csvCountyData(net_array);
@@ -479,10 +479,10 @@ export default class App extends React.Component {
                         </div>
                         <div className={"csv-class"}>
                             <div className={'csv-link'}>
-                                <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Exportar Datos Completos a Excel ⬇ </CSVLink>
+                                <CSVLink data={csvData()} style={prettyLink} filename={"map-data.csv"}>Exportar Conjunto de Datos a Excel ⬇ </CSVLink>
                             </div>
                             <div className={'csv-link'}>
-                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Exportar Municipio Seleccionado a Excel ⬇</CSVLink>
+                                <CSVLink data={selected_county_csv} headers={county_csv_headers} style={prettyLink} filename={"county-data.csv"}>Exportar Conjunto de Datos Seleccionados a Excel ⬇</CSVLink>
                             </div>
                         </div>
                     </div>
